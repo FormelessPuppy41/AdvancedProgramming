@@ -43,7 +43,7 @@ public class Main {
         int column = 3; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
         int from = 1; // 1 to skip the header, 0 to include the header. Must be smaller than the number of records in the file, otherwise an error is raised.
         boolean warmup = true;
-        boolean simulate = false;
+        boolean simulate = true;
         
         // Configure sample sizes for testing running times. [1,1500]
         List<Integer> sample_sizes = new ArrayList<>();

@@ -150,9 +150,9 @@ public class StopWatch {
      */
     @SuppressWarnings("unchecked")
     private static <T> T deepCopy(T data) {
-        if (data instanceof List) {
+        if (data instanceof List) { // Check if the data is a list, if so make a deep copy of it with the appropriate method
             return (T) new ArrayList<>((List<?>) data);
-        } else if (data instanceof String[]) {
+        } else if (data instanceof String[]) { // Check if the data is an array, if so make a deep copy of it with the appropriate method
             return (T) ((String[]) ((String[]) data).clone());
         }
         return data;
@@ -165,15 +165,12 @@ public class StopWatch {
      * @return the average of the long values
      */
     private static double calculateAverage(List<Long> values) {
-        if (values == null || values.isEmpty()) {
-            return 0;
-        }
-        System.out.println(values);
-
+        // Return 0 if the list is empty
+        if (values == null || values.isEmpty()) {return 0;}
+        
+        // Calculate the sum of the values
         long sum = 0;
-        for (long value : values) {
-            sum += value;
-        }
+        for (long value : values) {sum += value;}
         return (double) sum / values.size();
     }
 
