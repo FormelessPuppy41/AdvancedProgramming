@@ -1,4 +1,4 @@
-
+import java.util.function.Consumer;
 
 /**
  * A stopwatch accumulates time when it is running. You can
@@ -9,6 +9,21 @@ public class StopWatch {
     private long elapsedTime;
     private long startTime;
     private boolean isRunning;
+
+    /**
+     * Measures the time it takes to apply an algorithm to a given data set.
+     * 
+     * @param algorithm the algorithm to apply
+     * @param data the data to apply the algorithm to
+     */
+    public <T> void measureTime(Consumer<T> algorithm, T data) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        algorithm.accept(data); // apply the algorithm
+        stopWatch.stop();
+        stopWatch.output();
+    }
+
 
     /**
      * Constructs a stopwatch that is in the stopped state
@@ -61,5 +76,13 @@ public class StopWatch {
     public void reset() {
         elapsedTime = 0;
         isRunning = false;
+    }
+
+    /**
+     * Returns a string representation of the stopwatch
+     * 
+     */
+    public void output() {
+        System.out.println("Elapsed time: " + getElapsedTime() + " milliseconds");
     }
 }
