@@ -37,7 +37,8 @@ public class StopWatch {
         }
         
         if (simulate) {
-            List<Long> running_times = new ArrayList<>();
+            List<Long> running_times_nano = new ArrayList<>();
+            List<Long> running_times_milli = new ArrayList<>();
 
             for (int i = 0; i < 100; i++) {
                 // make a deep copy of the data
@@ -52,11 +53,14 @@ public class StopWatch {
 
                 // stop timing and record the time
                 stopWatch.stop();
-                running_times.add(stopWatch.getElapsedTime());
+                running_times_nano.add(stopWatch.getElapsedTimeInNano());
+                running_times_milli.add((long) stopWatch.getElapsedTimeInMilli());
             }
 
-            double averageTime = calculateAverage(running_times);
-            System.out.println("Average time: " + averageTime + " milliseconds");
+            double averageTimeNano = calculateAverage(running_times_nano);
+            double averageTimeMilli = calculateAverage(running_times_milli);
+            System.out.println("Average time: " + averageTimeNano + " nanoseconds");
+            System.out.println("Average time: " + averageTimeMilli + " milliseconds");
 
         } else {
         // Single run
@@ -88,7 +92,7 @@ public class StopWatch {
             return;
         }
         isRunning = true;
-        startTime = System.currentTimeMillis();
+        startTime = System.nanoTime();
     }
 
     /**
@@ -100,22 +104,30 @@ public class StopWatch {
             return;
         }
         isRunning = false;
-        long endTime = System.currentTimeMillis();
+        long endTime = System.nanoTime();
         elapsedTime = elapsedTime + endTime - startTime;
     }
 
-    /**
-     * Returns the total elapsed time.
-     * @return the total elapsed time
-     */
-    public long getElapsedTime() {
+    // Returns the total elapsed time in nanoseconds.
+    public long getElapsedTimeInNano() {
         if (isRunning) {
-            long endTime = System.currentTimeMillis();
-            return elapsedTime + endTime - startTime;
+            long endTime = System.nanoTime();
+            return elapsedTime + (endTime - startTime);
         } else {
             return elapsedTime;
         }
     }
+
+    // Returns the total elapsed time in milliseconds for convenience.
+    public double getElapsedTimeInMilli() {
+        return getElapsedTimeInNano() / 1_000_000.0; // Convert nanoseconds to milliseconds
+    }
+
+    // Prints the elapsed time in both milliseconds and nanoseconds
+    public void output() {
+        System.out.println("Elapsed time: " + getElapsedTimeInMilli() + " milliseconds (" + getElapsedTimeInNano() + " nanoseconds)");
+    }
+
 
     /**
      * Stops the watch and resets the elapsed time to 0.
@@ -123,14 +135,6 @@ public class StopWatch {
     public void reset() {
         elapsedTime = 0;
         isRunning = false;
-    }
-
-    /**
-     * Returns a string representation of the stopwatch
-     * 
-     */
-    public void output() {
-        System.out.println("Elapsed time: " + getElapsedTime() + " milliseconds");
     }
 
 

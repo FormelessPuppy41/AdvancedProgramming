@@ -17,16 +17,14 @@ public class Sorter{
      * @param to: the ending index of the list
      */
     public void quickSort(List<String[]> data, int column, int from, int to) {
-       // check if from is smaller than to
-       if (from >= to) {return;}
-       int part = partition(data, column, from, to);
+       // check if 'from' is smaller than 'to'
+       if (from < to) {
+        int pivot = partition(data, column, from, to);
 
-       // recursively sort the list
-       quickSort(data, column, from, part);
-       quickSort(data, column, part + 1, to);
-
-        // should probably consist of a CompareTo method for each row. Where the row is compared to the next row based on the column value.
-        // for (String[] row : data) {System.out.println(row[column]);}
+        // recursively sort the list
+        quickSort(data, column, from, pivot);
+        quickSort(data, column, pivot + 1, to);
+       }
     }
 
     /*
@@ -38,23 +36,59 @@ public class Sorter{
      * @param to: the ending index of the list
      * @return: the index of the partition
      */
-    private static int partition(List<String[]> data, int column, int from, int to) {
-        // initialize pivot and indices
-        String pivot = data.get(from)[column];
+    private int partition(List<String[]> data, int column, int from, int to) {
+        // median-of-three pivot selection for efficiency because you start in the middle instead of the first value.
+        int mid = (from + to) / 2;
+        String[] pivot = medianOfThree(data, column, from, mid, to);
+
         int i = from - 1;
         int j = to + 1;
 
-        // loop until indices cross
+        // Use the generic comparator based on the column type for modularity
         while (i < j) {
-            // FIXME: This only works for integers, not strings. Probably need to implement a compareTo method for strings.
-            i++; while (data.get(i)[column].compareTo(pivot) < 0) {i++;}
-            j--; while (data.get(j)[column].compareTo(pivot) > 0) {j--;}
-
-            if (i < j) {swap(data, i, j);} // swap elements
-            
+            do {i++;} while (compare(data.get(i)[column], pivot[column], column) < 0);
+            do {j--;} while (compare(data.get(j)[column], pivot[column], column) > 0);
+            swap(data, i, j);
         }
+
         // return the partition index
         return j;
+    }
+
+    /*
+     * Median of three algorithm, which selects the median of three values based on a specific column.
+     * 
+     * @param data: the list of strings to be sorted
+     * @param column: the column to sort the strings by. Starts at 0.
+     * @param low: the low index of the list
+     * @param mid: the middle index of the list
+     * @param high: the high index of the list
+     */
+    private String[] medianOfThree(List<String[]> data, int column, int low, int mid, int high) {
+        if (compare(data.get(low)[column], data.get(mid)[column], column) > 0) {swap(data, low, mid);}
+        if (compare(data.get(low)[column], data.get(high)[column], column) > 0) {swap(data, low, high);}
+        if (compare(data.get(mid)[column], data.get(high)[column], column) > 0) {swap(data, mid, high);}
+        
+        return data.get(mid);  // Use median as the pivot
+    }
+    
+    /*
+     * Compare method, which compares two values based on a specific column.
+     * 
+     * @param value1: the first value to compare
+     * @param value2: the second value to compare
+     * @param column: the column to sort the strings by. Starts at 0->3. Where 0 is Title, 1 is Rating, 2 is Duration and 3 is StartTime.
+     */
+    private int compare(String value1, String value2, int column) {
+        if (column == 0) { // compare strings - Title
+            return value1.compareTo(value2);
+        } else if (column == 1) { // compare floats - Rating
+            return Float.compare(Float.parseFloat(value1), Float.parseFloat(value2));
+        } else if (column == 2 || column == 3) { // compare integers - Duration and StartTime
+            return Integer.compare(Integer.parseInt(value1), Integer.parseInt(value2));
+        } else { // throw an error if the column is not between 0 and 3
+            throw new IllegalArgumentException("Column index must be between 0 and 3");
+        }
     }
 
     /*
