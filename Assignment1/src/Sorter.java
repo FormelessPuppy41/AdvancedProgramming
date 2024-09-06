@@ -3,7 +3,7 @@ import java.util.List;
 /*
  * Class that contains sorting algorithms for sorting a list of strings.
  * 
- * @Author: Berend Quist - 611968bq@eur.nl
+ * @Author: Martijn
  * 
  */
 public class Sorter{
