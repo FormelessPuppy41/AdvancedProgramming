@@ -6,7 +6,6 @@ import java.util.Map;
 public class Main {
 
     private StopWatch stopWatch = new StopWatch();
-    private Sorter sorter = new Sorter();
     private Utilities utilities = new Utilities(this.stopWatch);
 
     public static void main(String[] args) {
@@ -26,8 +25,6 @@ public class Main {
         
         // Map for individual files with their names
         Map<String, List<String[]>> fileMap = new HashMap<>();
-        // Configure sample sizes for testing running times. [1,1500]
-        List<Integer> sample_sizes = new ArrayList<>();
         // Configure the columns to be sorted by
         int[] sortColumns = new int[]{}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
 
@@ -42,9 +39,6 @@ public class Main {
         fileMap.put("file3", file3);
         fileMap.put("file4", file4);
         fileMap.put("file5", file5);
-
-        // Add sample sizes to test
-        sample_sizes.add(1500);
 
         // add the column to sort by
         sortColumns = new int[]{3}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
@@ -66,16 +60,19 @@ public class Main {
         fileMap = new HashMap<>(); // Clear the file map
         fileMap.put("file1", file1);
 
-        // Add sample sizes to test
-        sample_sizes = new ArrayList<>(); // Clear the sample size list
-        sample_sizes.add(250);
-
         // Add the columns to sort by
-        sortColumns = new int[]{1, 0}; // sort by title first, then by rating
+        sortColumns = new int[]{0, 1}; // sort by title first, then by rating
 
-
+        // Value to search for
+        String[] value = new String[]{
+            "M", // Title - String
+            null, // Rating - Float
+            null, // Duration - Int
+            null // StartTime - Int
+        };
+        
         // ---------- Run the model ------------
-        runAssignment1b(sortColumns, from, warmup, simulate, fileMap, sample_sizes);
+        runAssignment1b(sortColumns, from, warmup, simulate, fileMap, value);
 
     }
 
@@ -88,21 +85,28 @@ public class Main {
         System.out.println("Question 1a: Sorting movie data based on the start time");
         System.out.println("**********************************************************\n");
         
-        // Create a SorterApplier instance and run the sorting with names
-        SorterApplier sorterApplier = new SorterApplier(sortColumns);
-        sorterApplier.sortDataMultipleFiles(from, warmup, simulate, fileMap);
+        // Create a AlgorithmApplier instance and run the sorting with names
+        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns);
+        algorithmApplier.sortDataFileMap(from, warmup, simulate, fileMap);
     } 
 
-    private static void runAssignment1b(int[] sortColumns, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap, List<Integer> sampleSizes) {
+    // NOTE: All movies are asked, so only do the search for the last file containing all movies. 
+    private static void runAssignment1b(int[] sortColumns, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap, String[] value) {
         // Print the header
         System.out.println("**********************************************************\n");
         System.out.println("Question 1b: Sorting movie data based on their Title first and then by their Rating.");
         System.out.println("**********************************************************\n");
     
-        // Create an instance of SorterApplier to perform the sorting
-        SorterApplier sorterApplier = new SorterApplier(sortColumns);
-        sorterApplier.sortDataMultipleFiles(from, warmup, simulate, fileMap);
+        // Create an instance of AlgorithmApplier to perform the sorting/searching
+        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns);
+        algorithmApplier.sortDataFileMap(from, warmup, simulate, fileMap);
 
+        // Search for the value in the last file
+        int[] searchColumns = new int[]{0, 1}; // search by title
+        AlgorithmApplier algorithmApplier2 = new AlgorithmApplier(searchColumns);
+        algorithmApplier2.searchForValueFileMap(fileMap, value);
+
+        
     }
     
 

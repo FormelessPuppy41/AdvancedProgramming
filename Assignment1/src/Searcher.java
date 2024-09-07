@@ -23,14 +23,14 @@ public class Searcher {
             int mid = low + (high - low) / 2;
 
             // check if the value is found at the mid point
-            
-            if (this.comparator.compare(data.get(mid), value) == 0) {
+            int comparisonResult = this.comparator.compare(data.get(mid), value);
+            if (comparisonResult == 0) {
                 System.out.println("Found at index: " + mid);
                 return mid;
             }
             
             // recursively search the list using the comparator.
-            if (comparator.compare(data.get(mid), value) < 0) {
+            if (comparisonResult < 0) {
                 // search the right side of the list
                 return binarySearch(data, mid + 1, high, value);
             } else {

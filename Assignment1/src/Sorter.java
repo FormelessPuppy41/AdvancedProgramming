@@ -10,6 +10,10 @@ public class Sorter{
 
     private Comparator comparator;
 
+    // Constructor
+    public Sorter(Comparator comparator ) {
+        this.comparator = comparator;
+    }
 
     //public Sorter(int[] sortColumns) {this.comparator = new Comparator(sortColumns);}
 
@@ -21,16 +25,15 @@ public class Sorter{
      * @param from: the starting index of the list
      * @param to: the ending index of the list
      */
-    public void quickSort(List<String[]> data, Comparator comparator, int from, int to) {
-       this.comparator = comparator;
+    public void quickSort(List<String[]> data, int from, int to) {
 
         // check if 'from' is smaller than 'to'
        if (from < to) {
             int pivot = partition(data, from, to);
 
             // recursively sort the list
-            quickSort(data, this.comparator, from, pivot - 1);
-            quickSort(data, this.comparator, pivot + 1, to);
+            quickSort(data, from, pivot - 1);
+            quickSort(data, pivot + 1, to);
        } else if ( from == to) {}
     }
 

@@ -23,14 +23,21 @@ public class Comparator {
             int column = sortColumns[i];
             if (column < 0 || column > 3) {throw new IllegalArgumentException("Column index must be between 0 and 3");}
         
-            int returnValue = 0;
+            int returnValue;
+
+            String value1 = row1[column];
+            String value2 = row2.length <= column ? row2[0] : row2[column];
+
+            if (value2 == null) {
+                continue;
+            }
 
             if (column == 0) { // Compare strings - Title (column 0)
-                returnValue = row1[column].substring(0, 1).toLowerCase().compareTo(row2[column].substring(0, 1).toLowerCase());
+                returnValue = value1.substring(0, 1).toLowerCase().compareTo(value2.substring(0, 1).toLowerCase());
             } else if (column == 1) { // Compare floats - Rating (column 1)
-                returnValue = Float.compare(Float.parseFloat(row1[column]), Float.parseFloat(row2[column]));
+                returnValue = Float.compare(Float.parseFloat(value1), Float.parseFloat(value2));
             } else if (column == 2 || column == 3) { // Compare integers - Duration (column 2) or StartTime (column 3)
-                returnValue = Integer.compare(Integer.parseInt(row1[column]), Integer.parseInt(row2[column]));
+                returnValue = Integer.compare(Integer.parseInt(value1), Integer.parseInt(value2));
             } else {
                 throw new IllegalArgumentException("Column index must be between 0 and 3");
             }
