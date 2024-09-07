@@ -51,7 +51,7 @@ public class Utilities {
         return data; // Return the original data if it's not a list or array
     }
 
-    
+
     // ------------------------------ Helper methods ------------------------------
 
 
@@ -68,6 +68,7 @@ public class Utilities {
         // Run the algorithm multiple times and record the running times
         for (int i = 0; i < iterations; i++) {
             T dataCopy = deepCopy(data);
+            
             this.stopWatch.reset();
             this.stopWatch.start();
             algorithm.accept(dataCopy); // Apply the algorithm
@@ -91,12 +92,12 @@ public class Utilities {
      * @param data the data to apply the algorithm to
      */
     private <T> void _runSingle(Consumer<T> algorithm, T data) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.reset();
-        stopWatch.start();
+
+        this.stopWatch.reset();
+        this.stopWatch.start();
         algorithm.accept(data); // Apply the algorithm
-        stopWatch.stop();
-        stopWatch.output();
+        this.stopWatch.stop();
+        this.stopWatch.output();
     }
 
     /**

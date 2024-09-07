@@ -9,7 +9,10 @@ import java.util.List;
 public class Sorter{
 
     private Comparator comparator;
-    
+
+
+    //public Sorter(int[] sortColumns) {this.comparator = new Comparator(sortColumns);}
+
     /*
      * Quick sort algorithm, which sorts a list of strings based on a specific column.
      * 
@@ -23,12 +26,12 @@ public class Sorter{
 
         // check if 'from' is smaller than 'to'
        if (from < to) {
-        int pivot = partition(data, column, from, to);
+            int pivot = partition(data, column, from, to);
 
-        // recursively sort the list
-        quickSort(data, this.comparator, column, from, pivot);
-        quickSort(data, this.comparator, column, pivot + 1, to);
-       }
+            // recursively sort the list
+            quickSort(data, this.comparator, column, from, pivot - 1);
+            quickSort(data, this.comparator, column, pivot + 1, to);
+       } else if ( from == to) {}
     }
 
     /*
@@ -45,18 +48,19 @@ public class Sorter{
         int mid = (from + to) / 2;
         String[] pivot = medianOfThree(data, column, from, mid, to);
 
-        int i = from - 1;
-        int j = to + 1;
+        pivot = data.get(to);
 
-        // Use the generic comparator based on the column type for modularity
-        while (i < j) {
-            do {i++;} while (this.comparator.compare(data.get(i)[column], pivot[column], column) < 0);
-            do {j--;} while (this.comparator.compare(data.get(j)[column], pivot[column], column) > 0);
-            swap(data, i, j);
+        int i = (from - 1);
+
+        for (int j = from; j <= to - 1; j++) {
+            if (this.comparator.compare(data.get(j)[column], pivot[column], column) < 0) {
+                i++;
+                swap(data, i, j);
+            }
         }
-
+        swap(data, i + 1, to);
         // return the partition index
-        return j;
+        return i + 1;
     }
 
     /*
