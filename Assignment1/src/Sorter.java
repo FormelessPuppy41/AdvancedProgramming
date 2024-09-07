@@ -21,16 +21,16 @@ public class Sorter{
      * @param from: the starting index of the list
      * @param to: the ending index of the list
      */
-    public void quickSort(List<String[]> data, Comparator comparator, int column, int from, int to) {
+    public void quickSort(List<String[]> data, Comparator comparator, int from, int to) {
        this.comparator = comparator;
 
         // check if 'from' is smaller than 'to'
        if (from < to) {
-            int pivot = partition(data, column, from, to);
+            int pivot = partition(data, from, to);
 
             // recursively sort the list
-            quickSort(data, this.comparator, column, from, pivot - 1);
-            quickSort(data, this.comparator, column, pivot + 1, to);
+            quickSort(data, this.comparator, from, pivot - 1);
+            quickSort(data, this.comparator, pivot + 1, to);
        } else if ( from == to) {}
     }
 
@@ -43,17 +43,17 @@ public class Sorter{
      * @param to: the ending index of the list
      * @return: the index of the partition
      */
-    private int partition(List<String[]> data, int column, int from, int to) {
+    private int partition(List<String[]> data, int from, int to) {
         // median-of-three pivot selection for efficiency because you start in the middle instead of the first value.
         int mid = (from + to) / 2;
-        String[] pivot = medianOfThree(data, column, from, mid, to);
+        String[] pivot = medianOfThree(data, from, mid, to);
 
         pivot = data.get(to);
 
         int i = (from - 1);
 
         for (int j = from; j <= to - 1; j++) {
-            if (this.comparator.compare(data.get(j)[column], pivot[column], column) < 0) {
+            if (this.comparator.compare(data.get(j), pivot) < 0) {
                 i++;
                 swap(data, i, j);
             }
@@ -72,10 +72,10 @@ public class Sorter{
      * @param mid: the middle index of the list
      * @param high: the high index of the list
      */
-    private String[] medianOfThree(List<String[]> data, int column, int low, int mid, int high) {
-        if (this.comparator.compare(data.get(low)[column], data.get(mid)[column], column) > 0) {swap(data, low, mid);}
-        if (this.comparator.compare(data.get(low)[column], data.get(high)[column], column) > 0) {swap(data, low, high);}
-        if (this.comparator.compare(data.get(mid)[column], data.get(high)[column], column) > 0) {swap(data, mid, high);}
+    private String[] medianOfThree(List<String[]> data, int low, int mid, int high) {
+        if (this.comparator.compare(data.get(low), data.get(mid)) > 0) {swap(data, low, mid);}
+        if (this.comparator.compare(data.get(low), data.get(high)) > 0) {swap(data, low, high);}
+        if (this.comparator.compare(data.get(mid), data.get(high)) > 0) {swap(data, mid, high);}
         
         return data.get(mid);  // Use median as the pivot
     }

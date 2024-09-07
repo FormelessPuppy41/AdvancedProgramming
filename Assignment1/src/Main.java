@@ -7,7 +7,6 @@ public class Main {
 
     private StopWatch stopWatch = new StopWatch();
     private Sorter sorter = new Sorter();
-    private Comparator comparator = new Comparator();
     private Utilities utilities = new Utilities(this.stopWatch);
 
     public static void main(String[] args) {
@@ -29,7 +28,8 @@ public class Main {
         Map<String, List<String[]>> fileMap = new HashMap<>();
         // Configure sample sizes for testing running times. [1,1500]
         List<Integer> sample_sizes = new ArrayList<>();
-
+        // Configure the columns to be sorted by
+        int[] sortColumns = new int[]{}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
 
         //
         // Question 1a: Sorting movie data based on the start time
@@ -46,14 +46,16 @@ public class Main {
         // Add sample sizes to test
         sample_sizes.add(1500);
 
+        // add the column to sort by
+        sortColumns = new int[]{3}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
+
         // configure inputs
-        int column = 0; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
         int from = 1; // 1 to skip the header, 0 to include the header. Must be smaller than the number of records in the file, otherwise an error is raised.
         boolean warmup = false;
         boolean simulate = false;
 
         // ---------- Run the model ------------
-        runAssignment1a(column, from, warmup, simulate, fileMap, sample_sizes);
+        //runAssignment1a(sortColumns, from, warmup, simulate, fileMap, sample_sizes);
         
         //
         // Question 1b: Sorting movie data based on their Title first and then by their Rating.
@@ -61,57 +63,46 @@ public class Main {
 
         // ----------- Configure model ------------
         // Add the files to the map
-        fileMap = new HashMap<>();
+        fileMap = new HashMap<>(); // Clear the file map
         fileMap.put("file1", file1);
 
         // Add sample sizes to test
-        sample_sizes = new ArrayList<>();
+        sample_sizes = new ArrayList<>(); // Clear the sample size list
         sample_sizes.add(250);
 
-        // configure inputs
-        int column0 = 0; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
-        int column1 = 1; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
+        // Add the columns to sort by
+        sortColumns = new int[]{1, 0}; // sort by title first, then by rating
+
 
         // ---------- Run the model ------------
-        runAssignment1b(column0, column1, from, warmup, simulate, fileMap, sample_sizes);
+        runAssignment1b(sortColumns, from, warmup, simulate, fileMap, sample_sizes);
 
     }
 
 
     // TODO: Probably remove the assignment files and just add methods here. Also, make the stopwatch etc a class variable.
 
-    private static void runAssignment1a(int column, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap, List<Integer> sampleSizes) {
+    private static void runAssignment1a(int[] sortColumns, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap, List<Integer> sampleSizes) {
         // Print the header
         System.out.println("**********************************************************\n");
         System.out.println("Question 1a: Sorting movie data based on the start time");
         System.out.println("**********************************************************\n");
-
-        // Create a SorterApplier instance and run the sorting with names
-        SorterApplier sorterApplier = new SorterApplier();
-        sorterApplier.sortDataMultipleFiles(column, from, warmup, simulate, fileMap);
         
+        // Create a SorterApplier instance and run the sorting with names
+        SorterApplier sorterApplier = new SorterApplier(sortColumns);
+        sorterApplier.sortDataMultipleFiles(from, warmup, simulate, fileMap);
     } 
 
-    private static void runAssignment1b(int column0, int column1, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap, List<Integer> sampleSizes) {
+    private static void runAssignment1b(int[] sortColumns, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap, List<Integer> sampleSizes) {
         // Print the header
         System.out.println("**********************************************************\n");
         System.out.println("Question 1b: Sorting movie data based on their Title first and then by their Rating.");
         System.out.println("**********************************************************\n");
     
         // Create an instance of SorterApplier to perform the sorting
-        SorterApplier sorterApplier = new SorterApplier();
-        
-        // First sort by rating (column2), then by title (column1)
-        for (Map.Entry<String, List<String[]>> entry : fileMap.entrySet()) {
-            String fileName = entry.getKey();
-            List<String[]> fileContent = entry.getValue();
-            
-            // Sort first by rating (secondary criterion)
-            sorterApplier.sortDataSingleFile(fileContent, fileName, column1, from, warmup, simulate);
-            
-            // Sort by title (primary criterion) after sorting by rating
-            sorterApplier.sortDataSingleFile(fileContent, fileName, column0, from, warmup, simulate);
-        }
+        SorterApplier sorterApplier = new SorterApplier(sortColumns);
+        sorterApplier.sortDataMultipleFiles(from, warmup, simulate, fileMap);
+
     }
     
 

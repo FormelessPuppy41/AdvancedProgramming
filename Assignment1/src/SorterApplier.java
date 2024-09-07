@@ -5,17 +5,21 @@ public class SorterApplier {
 
     private StopWatch stopWatch = new StopWatch();
     private Sorter sorter = new Sorter();
-    private Comparator comparator = new Comparator();
+    private Comparator comparator;
     private Utilities utilities = new Utilities(stopWatch);
 
-    public void sortDataMultipleFiles(int column, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap) {
+    public SorterApplier(int[] sortColumns) {
+        this.comparator = new Comparator(sortColumns);
+    }
+
+    public void sortDataMultipleFiles(int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap) {
         // Iterate over the sample sizes
         // Sort each individual or combined file and print its name
         for (Map.Entry<String, List<String[]>> entry : fileMap.entrySet()) {
             String fileName = entry.getKey();
             List<String[]> fileContent = entry.getValue();
             
-            sortDataSingleFile(fileContent, fileName, column, from, warmup, simulate);
+            sortDataSingleFile(fileContent, fileName, from, warmup, simulate);
 
             // Print a separator between the different files
             System.out.println( "----------------------------------------------------------------");
@@ -23,9 +27,8 @@ public class SorterApplier {
     }
 
     // Method to output data and measure sorting times for a given dataset
-    public void sortDataSingleFile(List<String[]> file, String fileName, int column, int from, boolean warmup, boolean simulate) {
+    public void sortDataSingleFile(List<String[]> file, String fileName, int from, boolean warmup, boolean simulate) {
         // check the imputs and raise errors if necessary
-        if (column < 0 || column > 3) {throw new IllegalArgumentException("Column index must be between 0 and 3");}
         if (from < 1 || from >= file.size()) {throw new IllegalArgumentException("From index must be greater than 1 and smaller than the number of records in the file. Note that if from == 0 then the title is filtered aswell.");}
         
         // Set the sample size to the number of records in the file
@@ -33,7 +36,7 @@ public class SorterApplier {
 
         // log the sorting process, that includes tracking the time it takes to sort the data (i.e. the stopWatch.measureTime method)
         System.out.println("Sorting " + fileName);
-        this.utilities.measureTime(data -> this.sorter.quickSort(file, this.comparator, column, from, sampleSize), file, warmup, simulate);
+        this.utilities.measureTime(data -> this.sorter.quickSort(file, this.comparator, from, sampleSize), file, warmup, simulate);
         System.out.println("Finished sorting " + fileName + "\n");
         
         // print the sorted data
