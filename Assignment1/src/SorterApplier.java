@@ -1,24 +1,14 @@
 import java.util.List;
 import java.util.Map;
 
-public class Assignment1a {
+public class SorterApplier {
+    
+    private StopWatch stopWatch = new StopWatch();
+    private Sorter sorter = new Sorter();
+    private Comparator comparator = new Comparator();
+    private Utilities utilities = new Utilities(stopWatch);
 
-    private StopWatch stopWatch;
-    private Sorter sorter;
-
-    public Assignment1a(StopWatch stopWatch, Sorter sorter) {
-        this.stopWatch = stopWatch;
-        this.sorter = sorter;
-    }
-
-    // The method to run the main sorting task
-    public void runAssignment1a(int column, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap, List<Integer> sampleSizes) {
-
-        // Print the header
-        System.out.println("**********************************************************\n");
-        System.out.println("Question 1a: Sorting movie data based on the start time");
-        System.out.println("**********************************************************\n");
-
+    public void run(List<Integer> sampleSizes, int column, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap) {
         // Iterate over the sample sizes
         for (int sampleSize : sampleSizes) {
             System.out.println("Sample size: " + sampleSize + "\n");
@@ -43,7 +33,7 @@ public class Assignment1a {
 
         // log the sorting process, that includes tracking the time it takes to sort the data (i.e. the stopWatch.measureTime method)
         System.out.println("Sorting " + fileName);
-        stopWatch.measureTime(data -> sorter.quickSort(file, column, from, sampleSize), file, warmup, simulate);
+        this.utilities.measureTime(data -> this.sorter.quickSort(file, this.comparator, column, from, sampleSize), file, warmup, simulate);
         System.out.println("Finished sorting " + fileName + "\n");
         
         // print the sorted data
@@ -61,5 +51,6 @@ public class Assignment1a {
             // Assumes each row is an array of strings just like csv, join the columns with commas
             System.out.println(String.join(", ", row));
         }
-    }
+    } 
+    
 }
