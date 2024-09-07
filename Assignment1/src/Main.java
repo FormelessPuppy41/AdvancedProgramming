@@ -49,6 +49,7 @@ public class Main {
         List<Integer> sample_sizes = new ArrayList<>();
         sample_sizes.add(250);
         sample_sizes.add(500);
+        sample_sizes.add(750);
         sample_sizes.add(1000);
         sample_sizes.add(1500);
 
