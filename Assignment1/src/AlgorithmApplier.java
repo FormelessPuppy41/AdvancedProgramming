@@ -3,12 +3,12 @@ import java.util.Map;
 
 public class AlgorithmApplier {
 
-    private StopWatch stopWatch = new StopWatch();
-    private Utilities utilities = new Utilities(stopWatch);
-    private Sorter sorter;
-    private Searcher searcher;
-    private Comparator sortComparator;
-    private Comparator searchComparator;
+    protected final StopWatch stopWatch = new StopWatch();
+    protected final Utilities utilities = new Utilities(stopWatch);
+    protected final Sorter sorter;
+    protected final Searcher searcher;
+    protected final Comparator sortComparator;
+    protected final Comparator searchComparator;
 
     public AlgorithmApplier(int[] sortColumns, int[] searchColumns) {
         this.sortComparator = new Comparator(sortColumns);
@@ -21,6 +21,8 @@ public class AlgorithmApplier {
     public AlgorithmApplier(int[] sortColumns) {
         this.sortComparator = new Comparator(sortColumns);
         this.sorter = new Sorter(sortComparator);
+        this.searchComparator = null;
+        this.searcher = null;
     }
 
     public void sortDataFileMap(int from, boolean warmup, boolean simulate, boolean ascending, Map<String, List<String[]>> fileMap) {

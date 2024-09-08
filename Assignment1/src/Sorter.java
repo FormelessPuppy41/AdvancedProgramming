@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class Sorter{
 
-    private Comparator comparator;
+    protected final Comparator comparator;
 
     // Constructor
     public Sorter(Comparator comparator ) {

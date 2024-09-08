@@ -1,6 +1,6 @@
 public class Comparator {
 
-    public final int[] sortColumns;
+    protected final int[] sortColumns;
 
     public Comparator(int[] sortColumns) {
         this.sortColumns = sortColumns;

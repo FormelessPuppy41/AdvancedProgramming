@@ -2,8 +2,8 @@ import java.util.List;
 
 public class Searcher {
 
-    private Comparator sortComparator;
-    private Comparator searchComparator;
+    protected final Comparator sortComparator;
+    protected final Comparator searchComparator;
 
     public Searcher(Comparator sortComparator, Comparator searchComparator) {
         this.sortComparator = sortComparator;

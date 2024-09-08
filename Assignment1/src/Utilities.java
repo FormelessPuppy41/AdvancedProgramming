@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class Utilities {
-    private StopWatch stopWatch;
+    protected final StopWatch stopWatch;
 
     public Utilities(StopWatch stopWatch) {
         this.stopWatch = stopWatch;
