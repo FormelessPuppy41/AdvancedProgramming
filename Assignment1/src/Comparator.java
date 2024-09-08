@@ -1,37 +1,29 @@
-
-
 public class Comparator {
 
-    private final int[] sortColumns;
+    public final int[] sortColumns;
 
     public Comparator(int[] sortColumns) {
         this.sortColumns = sortColumns;
     }
 
-
-    /*
-     * Compare method, which compares two values based on a specific column.
-     * 
-     * @param value1: the first value to compare
-     * @param value2: the second value to compare
-     * @param column: the column to sort the strings by. Starts at 0->3. Where 0 is Title, 1 is Rating, 2 is Duration and 3 is StartTime.
-     */
-    public int compare(String[] row1, String[] row2) {
+    public int compare(String[] row1, String[] row2, boolean ascending) {
         // Loop through all specified columns for sorting
-        for (int i = sortColumns.length - 1; i >= 0; i--) {
+        for (int column : sortColumns) {
             // Get the column index & check if it is valid
-            int column = sortColumns[i];
-            if (column < 0 || column > 3) {throw new IllegalArgumentException("Column index must be between 0 and 3");}
-        
-            int returnValue;
+            //int column = sortColumns[i];
+            if (column < 0 || column > 3) {
+                throw new IllegalArgumentException("Column index must be between 0 and 3");
+            }
 
+            int returnValue = 0;
             String value1 = row1[column];
-            String value2 = row2.length <= column ? row2[0] : row2[column];
+            String value2 = row2[column];
 
             if (value2 == null) {
                 continue;
             }
 
+            // Compare based on column type
             if (column == 0) { // Compare strings - Title (column 0)
                 returnValue = value1.substring(0, 1).toLowerCase().compareTo(value2.substring(0, 1).toLowerCase());
             } else if (column == 1) { // Compare floats - Rating (column 1)
@@ -42,14 +34,14 @@ public class Comparator {
                 throw new IllegalArgumentException("Column index must be between 0 and 3");
             }
 
-            // If the current column comparison gives a non-zero result, return that result.
+
+            // Return comparison result, accounting for ascending/descending order
             if (returnValue != 0) {
                 return returnValue;
             }
         }
-        
+
         // If all columns are equal
         return 0;
     }
-
 }

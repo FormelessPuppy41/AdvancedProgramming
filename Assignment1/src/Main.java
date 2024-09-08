@@ -27,8 +27,9 @@ public class Main {
         Map<String, List<String[]>> fileMap = new HashMap<>();
         // Configure the columns to be sorted by
         int[] sortColumns = new int[]{}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
+        int[] searchColumns = new int[]{}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
 
-        //
+        // ---------------------------------------------------------------------------------------------------------------------------------
         // Question 1a: Sorting movie data based on the start time
         //
 
@@ -44,24 +45,31 @@ public class Main {
         sortColumns = new int[]{3}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
 
         // configure inputs
+        boolean ascending = false; // Sort in ascending order
+
+
         int from = 1; // 1 to skip the header, 0 to include the header. Must be smaller than the number of records in the file, otherwise an error is raised.
         boolean warmup = false;
         boolean simulate = false;
 
         // ---------- Run the model ------------
-        //runAssignment1a(sortColumns, from, warmup, simulate, fileMap, sample_sizes);
+        // runAssignment1a(sortColumns, from, warmup, simulate, ascending, fileMap);
         
-        //
+        // ---------------------------------------------------------------------------------------------------------------------------------
         // Question 1b: Sorting movie data based on their Title first and then by their Rating.
         //
 
         // ----------- Configure model ------------
+        ascending = true; // Sort in ascending order
+
         // Add the files to the map
         fileMap = new HashMap<>(); // Clear the file map
         fileMap.put("file1", file1);
 
         // Add the columns to sort by
-        sortColumns = new int[]{0, 1}; // sort by title first, then by rating
+        sortColumns = new int[]{0, 1}; // sort by title first, then by rating -- used for the sorting
+        // Add the columns to search by
+        searchColumns = new int[]{0}; // search by title -- used for the search in a single column
 
         // Value to search for
         String[] value = new String[]{
@@ -72,14 +80,24 @@ public class Main {
         };
         
         // ---------- Run the model ------------
-        runAssignment1b(sortColumns, from, warmup, simulate, fileMap, value);
+        //runAssignment1b(sortColumns, searchColumns, from, warmup, simulate, fileMap, value, ascending);
 
+
+        
+        // ---------------------------------------------------------------------------------------------------------------------------------
+        // Question 1d: Sorting movie data based on their Title first and then by their Rating.
+        //
+
+        // ----------- Configure model ------------
+
+        // ---------- Run the model ------------
+        runAssignment1d();
     }
 
 
     // TODO: Probably remove the assignment files and just add methods here. Also, make the stopwatch etc a class variable.
 
-    private static void runAssignment1a(int[] sortColumns, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap, List<Integer> sampleSizes) {
+    private static void runAssignment1a(int[] sortColumns, int from, boolean warmup, boolean simulate, boolean ascending, Map<String, List<String[]>> fileMap) {
         // Print the header
         System.out.println("**********************************************************\n");
         System.out.println("Question 1a: Sorting movie data based on the start time");
@@ -87,26 +105,28 @@ public class Main {
         
         // Create a AlgorithmApplier instance and run the sorting with names
         AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns);
-        algorithmApplier.sortDataFileMap(from, warmup, simulate, fileMap);
+        algorithmApplier.sortDataFileMap(from, warmup, simulate, ascending, fileMap);
     } 
 
     // NOTE: All movies are asked, so only do the search for the last file containing all movies. 
-    private static void runAssignment1b(int[] sortColumns, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap, String[] value) {
+    private static void runAssignment1b(int[] sortColumns, int[] searchColumns, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap, String[] value, boolean ascending) {
         // Print the header
-        System.out.println("**********************************************************\n");
+        System.out.println("\n**********************************************************\n");
         System.out.println("Question 1b: Sorting movie data based on their Title first and then by their Rating.");
         System.out.println("**********************************************************\n");
     
         // Create an instance of AlgorithmApplier to perform the sorting/searching
-        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns);
-        algorithmApplier.sortDataFileMap(from, warmup, simulate, fileMap);
+        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns, searchColumns);
+        algorithmApplier.sortDataFileMap(from, warmup, simulate, ascending, fileMap);
 
         // Search for the value in the last file
-        int[] searchColumns = new int[]{0, 1}; // search by title
-        AlgorithmApplier algorithmApplier2 = new AlgorithmApplier(searchColumns);
-        algorithmApplier2.searchForValueFileMap(fileMap, value);
+        algorithmApplier.searchForValueFileMap(fileMap, value, ascending);
 
-        
+        //TODO: Add the option to search/sort descending or ascending.
+    }
+
+    private static void runAssignment1d(){
+
     }
     
 
