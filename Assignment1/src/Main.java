@@ -83,15 +83,18 @@ public class Main {
         //runAssignment1b(sortColumns, searchColumns, from, warmup, simulate, fileMap, value, ascending);
 
 
-        
+
         // ---------------------------------------------------------------------------------------------------------------------------------
         // Question 1d: Sorting movie data based on their Title first and then by their Rating.
         //
 
         // ----------- Configure model ------------
+        String startNode = "Home";
+
+        sortColumns = new int[]{0}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
 
         // ---------- Run the model ------------
-        runAssignment1d();
+        runAssignment1d(fileMap, startNode, sortColumns, ascending);
     }
 
 
@@ -104,7 +107,7 @@ public class Main {
         System.out.println("**********************************************************\n");
         
         // Create a AlgorithmApplier instance and run the sorting with names
-        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns);
+        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns, ascending);
         algorithmApplier.sortDataFileMap(from, warmup, simulate, ascending, fileMap);
     } 
 
@@ -116,7 +119,7 @@ public class Main {
         System.out.println("**********************************************************\n");
     
         // Create an instance of AlgorithmApplier to perform the sorting/searching
-        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns, searchColumns);
+        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns, searchColumns, ascending);
         algorithmApplier.sortDataFileMap(from, warmup, simulate, ascending, fileMap);
 
         // Search for the value in the last file
@@ -125,16 +128,12 @@ public class Main {
         //TODO: Add the option to search/sort descending or ascending.
     }
 
-    private static void runAssignment1d(){
-
-    }
+    private static void runAssignment1d(Map<String, List<String[]>> fileMap, String startingNode, int[] sortColumns, boolean ascending) {
+        // Create an instance of AlgorithmApplier to perform the optimisation.
+        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns, ascending);
+        algorithmApplier.sortDataFileMap(1, false, false, ascending, fileMap);
+        algorithmApplier.optimiseMovieScheduleFileMap(fileMap, startingNode);
     
-
-
-    // Method to combine two movie lists
-    private static List<String[]> _combineFiles(List<String[]> file1, List<String[]> file2) {
-        List<String[]> combinedFiles = new ArrayList<>(file1);
-        combinedFiles.addAll(file2);
-        return combinedFiles;
+        
     }
 }

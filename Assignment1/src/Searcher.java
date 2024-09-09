@@ -1,13 +1,21 @@
 import java.util.List;
 
+import javax.naming.ldap.SortResponseControl;
+
 public class Searcher {
+    protected final Sorter sorter;
 
     protected final Comparator sortComparator;
     protected final Comparator searchComparator;
 
-    public Searcher(Comparator sortComparator, Comparator searchComparator) {
-        this.sortComparator = sortComparator;
+    protected final boolean ascending;
+
+    public Searcher(Sorter sorter, Comparator searchComparator) {
+        this.sorter = sorter;
+        this.sortComparator = this.sorter.comparator;
         this.searchComparator = searchComparator;
+
+        this.ascending = this.sortComparator.ascending;
     }
 
     /*
@@ -19,13 +27,17 @@ public class Searcher {
      * @param high: the ending index of the list
      * @param value: the value to search for
      */
-    public int binarySearch(List<String[]> data, int low, int high, String[] value, boolean ascending) {
+    public int binarySearch(List<String[]> data, int low, int high, String[] value) {
+
+        // if the data is sorted. 
+        // if (!this.sorter.isDataSorted(data)) { throw new IllegalArgumentException("Data must be sorted before searching.");//for (String[] row : data) {System.out.println(String.join(", ", row));}}
+
         // check if the data is 'filtered' in ascending order, that is the first element is smaller than the value.
         if (low <= high) {
             int mid = low + (high - low) / 2;
 
             // check if the value is found at the midpoint
-            int comparisonResult = this.sortComparator.compare(data.get(mid), value, ascending);
+            int comparisonResult = this.sortComparator.compare(data.get(mid), value);
             if (comparisonResult == 0) {
                 System.out.println("Found a matching value at index: " + mid);
                 return mid;
@@ -34,10 +46,10 @@ public class Searcher {
             // recursively search the list using the comparator.
             if (comparisonResult < 0) {
                     // search the right side of the list
-                return binarySearch(data, mid + 1, high, value, ascending);
+                return binarySearch(data, mid + 1, high, value);
             } else {
                     // search the left side of the list
-                return binarySearch(data, low, mid - 1, value, ascending);
+                return binarySearch(data, low, mid - 1, value);
             }
         } else {
             // return -1 if the value is not found.
@@ -51,7 +63,7 @@ public class Searcher {
         int first = -1;
         int last = -1;
 
-        int startIndex = binarySearch(data, 1, data.size() - 1, value, ascending);
+        int startIndex = binarySearch(data, 1, data.size() - 1, value);
 
         // find the first and last index of the value.
         System.out.println("Starting the search for the first and last index with the value around the starting index: " + startIndex);
@@ -72,7 +84,7 @@ public class Searcher {
             // So, either first is the largest value or it will be replaced by a larger value.
             result = first; 
             for (int i = first; i <= last; i++) {
-                if (this.sortComparator.compare(data.get(i), data.get(result), true) > 0) {
+                if (this.sortComparator.compare(data.get(i), data.get(result)) > 0) {
                     result = i;
                 }
             }
@@ -86,7 +98,7 @@ public class Searcher {
         int result = -1;
 
         for (int i = startIndex; i >= 0; i--) {
-            if (this.searchComparator.compare(data.get(i), value, true) == 0) {
+            if (this.searchComparator.compare(data.get(i), value) == 0) {
                 result = i;
             }
         }
@@ -98,7 +110,7 @@ public class Searcher {
         int result = -1;
 
         for (int i = startIndex; i < data.size(); i++) {
-            if (this.searchComparator.compare(data.get(i), value, true) == 0) {
+            if (this.searchComparator.compare(data.get(i), value) == 0) {
                 result = i;
             }
         }

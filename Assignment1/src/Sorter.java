@@ -9,10 +9,23 @@ import java.util.List;
 public class Sorter{
 
     protected final Comparator comparator;
+    protected final boolean ascending;
 
     // Constructor
-    public Sorter(Comparator comparator ) {
+    public Sorter(Comparator comparator) {
         this.comparator = comparator;
+        this.ascending = this.comparator.ascending;
+    }
+
+    public boolean isDataSorted(List<String[]> data) {
+        // loop through the data to check if it is sorted, if not set dataSorted to false
+        for (int i = 1; i < data.size() - 1; i++) {
+            if (this.comparator.compare(data.get(i), data.get(i+1)) != 0) {
+                System.out.println("Value1: " + String.join(", ", data.get(i)) + " Value2: " + String.join(", ", data.get(i+1)));
+                return false;
+            }
+        }
+        return true;
     }
 
     //public Sorter(int[] sortColumns) {this.comparator = new Comparator(sortColumns);}
@@ -25,15 +38,15 @@ public class Sorter{
      * @param from: the starting index of the list
      * @param to: the ending index of the list
      */
-    public void quickSort(List<String[]> data, int from, int to, boolean ascending) {
+    public void quickSort(List<String[]> data, int from, int to) {
 
         // check if 'from' is smaller than 'to'
        if (from < to) {
-            int pivot = partition(data, from, to, ascending);
+            int pivot = partition(data, from, to);
 
             // recursively sort the list
-            quickSort(data, from, pivot - 1, ascending);
-            quickSort(data, pivot + 1, to, ascending);
+            quickSort(data, from, pivot - 1);
+            quickSort(data, pivot + 1, to);
        } else if ( from == to) {}
     }
 
@@ -46,17 +59,17 @@ public class Sorter{
      * @param to: the ending index of the list
      * @return: the index of the partition
      */
-    private int partition(List<String[]> data, int from, int to, boolean ascending) {
+    private int partition(List<String[]> data, int from, int to) {
         // median-of-three pivot selection for efficiency because you start in the middle instead of the first value.
         int mid = (from + to) / 2;
-        String[] pivot = medianOfThree(data, from, mid, to, ascending);
+        String[] pivot = medianOfThree(data, from, mid, to);
 
         pivot = data.get(to);
 
         int i = (from - 1);
 
         for (int j = from; j <= to - 1; j++) {
-            if (this.comparator.compare(data.get(j), pivot, ascending) < 0) {
+            if (this.comparator.compare(data.get(j), pivot) < 0) {
                 i++;
                 swap(data, i, j);
             }
@@ -75,10 +88,10 @@ public class Sorter{
      * @param mid: the middle index of the list
      * @param high: the high index of the list
      */
-    private String[] medianOfThree(List<String[]> data, int low, int mid, int high, boolean ascending) {
-        if (this.comparator.compare(data.get(low), data.get(mid), ascending) > 0) {swap(data, low, mid);}
-        if (this.comparator.compare(data.get(low), data.get(high), ascending) > 0) {swap(data, low, high);}
-        if (this.comparator.compare(data.get(mid), data.get(high), ascending) > 0) {swap(data, mid, high);}
+    private String[] medianOfThree(List<String[]> data, int low, int mid, int high) {
+        if (this.comparator.compare(data.get(low), data.get(mid)) > 0) {swap(data, low, mid);}
+        if (this.comparator.compare(data.get(low), data.get(high)) > 0) {swap(data, low, high);}
+        if (this.comparator.compare(data.get(mid), data.get(high)) > 0) {swap(data, mid, high);}
         
         return data.get(mid);  // Use median as the pivot
     }

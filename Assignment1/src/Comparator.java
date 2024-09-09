@@ -2,11 +2,14 @@ public class Comparator {
 
     protected final int[] sortColumns;
 
-    public Comparator(int[] sortColumns) {
+    protected final boolean ascending;
+
+    public Comparator(int[] sortColumns, boolean ascending) {
         this.sortColumns = sortColumns;
+        this.ascending = ascending;
     }
 
-    public int compare(String[] row1, String[] row2, boolean ascending) {
+    public int compare(String[] row1, String[] row2) {
         // Loop through all specified columns for sorting
         for (int column : sortColumns) {
             // Get the column index & check if it is valid
