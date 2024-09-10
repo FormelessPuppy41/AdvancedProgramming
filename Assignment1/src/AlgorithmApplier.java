@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +12,6 @@ public class AlgorithmApplier {
 
     protected final Comparator sortComparator;
     protected final Comparator searchComparator;
-
 
     public AlgorithmApplier(int[] sortColumns, int[] searchColumns, boolean ascendingSort) {
         this.sortComparator = new Comparator(sortColumns, ascendingSort);

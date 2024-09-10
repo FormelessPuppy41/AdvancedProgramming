@@ -1,139 +1,94 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Main {
-
+    
     private StopWatch stopWatch = new StopWatch();
     private Utilities utilities = new Utilities(this.stopWatch);
 
+    protected List<Movie> file1;
+    protected List<Movie> file2;
+    protected List<Movie> file3;
+    protected List<Movie> file4;
+    protected List<Movie> file5;
+
     public static void main(String[] args) {
+        Main main = new Main();
+
+        main.processData();
+
+        // ------------- Run Assignment 1a -------------
+        main.runAssignment1a();
+
+        // ------------- Run Assignment 1b -------------
+        // main.runAssignment1b();
+
+        // ------------- Run Assignment 1d -------------
+        // main.runAssignment1d();
+    }
+
+    //TODO: Add these methods in a separate class: Assignments.java class Same for the processData method
+
+    // ------------- Assignment 1a -------------
+    private void runAssignment1a() {
+        Sorter2 sorter = new Sorter2();
+
+        sorter.quickSort(this.file1, 1, this.file1.size() - 1);
+        sorter.quickSort(this.file2, 1, this.file2.size() - 1);
+        sorter.quickSort(this.file3, 1, this.file3.size() - 1);
+        sorter.quickSort(this.file4, 1, this.file4.size() - 1);
+        sorter.quickSort(this.file5, 1, this.file5.size() - 1);
+
+        //utilities.measureTime(data -> sorter.quickSort(this.file1, 1, this.file1.size() - 1), this.file1, false, false);
+        //utilities.measureTime(data -> sorter.quickSort(this.file2, 1, this.file2.size() - 1), this.file2, false, false);
+        //utilities.measureTime(data -> sorter.quickSort(this.file3, 1, this.file3.size() - 1), this.file3, false, false);
+        // utilities.measureTime(data -> sorter.quickSort(this.file4, 1, this.file4.size() - 1), this.file4, false, false);
+        // utilities.measureTime(data -> sorter.quickSort(this.file5, 1, this.file5.size() - 1), this.file5, false, false);
+
+        //outputData(this.file1);
+    }
+
+    // ------------- Assignment 1b -------------
+    private void runAssignment1b() {
+        Sorter2 sorter = new Sorter2();
+        sorter.quickSort(file5, 1, file5.size() - 1);
+
+
+    }
+
+    // ------------- Assignment 1d -------------
+    private void runAssignment1d() {
+        Sorter2 sorter = new Sorter2();
+    }
+
+    public void processData() {
 
         // ------------- Read CSV files -------------
-
         // Create a CSVReader instance
         CSVReader csvReader = new CSVReader();
         // Read the CSV files
-        List<String[]> file1 = csvReader.readCSV("Assignment1/data/movies_1.csv");
-        List<String[]> file2 = csvReader.readCSV("Assignment1/data/movies_2.csv");
-        List<String[]> file3 = csvReader.readCSV("Assignment1/data/movies_3.csv");
-        List<String[]> file4 = csvReader.readCSV("Assignment1/data/movies_4.csv");
-        List<String[]> file5 = csvReader.readCSV("Assignment1/data/movies_5.csv");
-        
-        // ------------- Create helper stores -------------
-        
-        // Map for individual files with their names
-        Map<String, List<String[]>> fileMap = new HashMap<>();
-        // Configure the columns to be sorted by
-        int[] sortColumns = new int[]{}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
-        int[] searchColumns = new int[]{}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
-
-        // ---------------------------------------------------------------------------------------------------------------------------------
-        // Question 1a: Sorting movie data based on the start time
-        //
-
-        // ------------ Configure model ------------
-        // Add the files to the map
-        fileMap.put("file1", file1);
-        fileMap.put("file2", file2);
-        fileMap.put("file3", file3);
-        fileMap.put("file4", file4);
-        fileMap.put("file5", file5);
-
-        // add the column to sort by
-        sortColumns = new int[]{3}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
-
-        // configure inputs
-        boolean ascending = false; // Sort in ascending order
-
-
-        int from = 1; // 1 to skip the header, 0 to include the header. Must be smaller than the number of records in the file, otherwise an error is raised.
-        boolean warmup = false;
-        boolean simulate = false;
-
-        // ---------- Run the model ------------
-        // runAssignment1a(sortColumns, from, warmup, simulate, ascending, fileMap);
-        
-        // ---------------------------------------------------------------------------------------------------------------------------------
-        // Question 1b: Sorting movie data based on their Title first and then by their Rating.
-        //
-
-        // ----------- Configure model ------------
-        ascending = true; // Sort in ascending order
-
-        // Add the files to the map
-        fileMap = new HashMap<>(); // Clear the file map
-        fileMap.put("file1", file1);
-
-        // Add the columns to sort by
-        sortColumns = new int[]{0, 1}; // sort by title first, then by rating -- used for the sorting
-        // Add the columns to search by
-        searchColumns = new int[]{0}; // search by title -- used for the search in a single column
-
-        // Value to search for
-        String[] value = new String[]{
-            "M", // Title - String
-            null, // Rating - Float
-            null, // Duration - Int
-            null // StartTime - Int
-        };
-        
-        // ---------- Run the model ------------
-        //runAssignment1b(sortColumns, searchColumns, from, warmup, simulate, fileMap, value, ascending);
-
-
-
-        // ---------------------------------------------------------------------------------------------------------------------------------
-        // Question 1d: Sorting movie data based on their Title first and then by their Rating.
-        //
-
-        // ----------- Configure model ------------
-        String startNode = "Home";
-
-        sortColumns = new int[]{0}; // 0 title (string), 1 rating (float), 2 duration (int), 3 startTime (int)
-
-        // ---------- Run the model ------------
-        runAssignment1d(fileMap, startNode, sortColumns, ascending);
+        this.file1 = processData(csvReader.readCSV("Assignment1/data/movies_1.csv"));
+        this.file2 = processData(csvReader.readCSV("Assignment1/data/movies_2.csv"));
+        this.file3 = processData(csvReader.readCSV("Assignment1/data/movies_3.csv"));
+        this.file4 = processData(csvReader.readCSV("Assignment1/data/movies_4.csv"));
+        this.file5 = processData(csvReader.readCSV("Assignment1/data/movies_5.csv"));
     }
 
+    // -------------- Helper Functions --------------
 
-    // TODO: Probably remove the assignment files and just add methods here. Also, make the stopwatch etc a class variable.
-
-    private static void runAssignment1a(int[] sortColumns, int from, boolean warmup, boolean simulate, boolean ascending, Map<String, List<String[]>> fileMap) {
-        // Print the header
-        System.out.println("**********************************************************\n");
-        System.out.println("Question 1a: Sorting movie data based on the start time");
-        System.out.println("**********************************************************\n");
-        
-        // Create a AlgorithmApplier instance and run the sorting with names
-        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns, ascending);
-        algorithmApplier.sortDataFileMap(from, warmup, simulate, ascending, fileMap);
-    } 
-
-    // NOTE: All movies are asked, so only do the search for the last file containing all movies. 
-    private static void runAssignment1b(int[] sortColumns, int[] searchColumns, int from, boolean warmup, boolean simulate, Map<String, List<String[]>> fileMap, String[] value, boolean ascending) {
-        // Print the header
-        System.out.println("\n**********************************************************\n");
-        System.out.println("Question 1b: Sorting movie data based on their Title first and then by their Rating.");
-        System.out.println("**********************************************************\n");
-    
-        // Create an instance of AlgorithmApplier to perform the sorting/searching
-        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns, searchColumns, ascending);
-        algorithmApplier.sortDataFileMap(from, warmup, simulate, ascending, fileMap);
-
-        // Search for the value in the last file
-        algorithmApplier.searchForValueFileMap(fileMap, value, ascending);
-
-        //TODO: Add the option to search/sort descending or ascending.
+    private static List<Movie> processData(List<String[]> file) {
+        List<Movie> movies = new ArrayList<>();
+        for (int i = 1; i < file.size(); i++) {
+            String[] row = file.get(i);
+            Movie movie = new Movie(row[0], Double.parseDouble(row[1]), Integer.parseInt(row[2]), Integer.parseInt(row[3]));
+            movies.add(movie);
+        }
+        return movies;
     }
 
-    private static void runAssignment1d(Map<String, List<String[]>> fileMap, String startingNode, int[] sortColumns, boolean ascending) {
-        // Create an instance of AlgorithmApplier to perform the optimisation.
-        AlgorithmApplier algorithmApplier = new AlgorithmApplier(sortColumns, ascending);
-        algorithmApplier.sortDataFileMap(1, false, false, ascending, fileMap);
-        algorithmApplier.optimiseMovieScheduleFileMap(fileMap, startingNode);
-    
-        
+    private void outputData(List<Movie> movies) {
+        for (Movie movie : movies) {
+            System.out.println(movie.toString());
+        }
     }
 }
