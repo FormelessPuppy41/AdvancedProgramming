@@ -94,9 +94,14 @@ public class Main {
         
         // Create a new Optimiser instance to optimise the movie schedule
         Optimiser optimiser = new Optimiser(currentFile, graphInitialiser.getGraph(), graphInitialiser.getArcs(), startingNode);
-        Double[] path = optimiser.optimise(true);
+        //Double[] path = optimiser.optimise(true);
         
-        System.out.println(path);
+        utilities.measureTime(data -> optimiser.optimise(true), currentFile, false, false);
+        
+        List<Movie> sequence = optimiser.getOptimalMovieSequence();
+        System.out.println(sequence.toString());
+
+        //FIXME: fix the output of the sequence.
     }
 
     public void processData() {

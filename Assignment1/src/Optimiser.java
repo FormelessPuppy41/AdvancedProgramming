@@ -89,4 +89,20 @@ public class Optimiser {
             return longestPath();
         }
     }
+
+    public List<Movie> getOptimalMovieSequence() {
+        if (this.previousNode == null) {
+            throw new IllegalArgumentException("The previous node list is empty.");
+        } else {
+        List<Movie> optimalSequence = new ArrayList<>();
+        int i = this.graph.getNodes().indexOf(this.startNode);
+
+        while (this.previousNode.get(i) != null) {
+            optimalSequence.add(this.graph.getNodes().get(i));
+            i = this.graph.getNodes().indexOf(this.previousNode.get(i));
+        }
+        
+        return optimalSequence;
+        }
+    }
 }
