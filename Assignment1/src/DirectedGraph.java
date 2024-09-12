@@ -54,7 +54,6 @@ public class DirectedGraph<V>
 		}
 		else if (inArcs.containsKey(node))
 		{	
-			System.out.println(node + ", " + inArcs.get(node));
 			throw new IllegalArgumentException("Unable to add the same node twice to the same graph");
 		}
 		else
@@ -62,7 +61,6 @@ public class DirectedGraph<V>
 			nodes.add(node);
 			inArcs.put(node, new ArrayList<>());
 			outArcs.put(node, new ArrayList<>());
-			System.out.println(node + ", " + inArcs.get(node));
 		}
 	}
 

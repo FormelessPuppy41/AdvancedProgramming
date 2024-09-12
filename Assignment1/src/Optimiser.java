@@ -1,22 +1,22 @@
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.ArrayList;
 
 public class Optimiser {
-    protected final DirectedGraph<String> graph;
-    protected final DirectedGraphArc<String> arcs;
+    protected final DirectedGraph<Movie> graph;
+    protected final DirectedGraphArc<Movie> arcs;
     
     protected Double[] shortestPath;
-    protected List<String> previousNode;
+    protected Double[] longestPath;
 
-    protected final String startNode;
+    protected List<Movie> previousNode;
+
+    protected final Movie startNode;
     protected int indexStartNode;
 
-    protected final List<String[]> data;
+    protected final List<Movie> data;
     protected boolean dataSorted = false;
 
-    public Optimiser(List<String[]> data, DirectedGraph<String> graph, DirectedGraphArc<String> arcs, String startingNode) {
+    public Optimiser(List<Movie> data, DirectedGraph<Movie> graph, DirectedGraphArc<Movie> arcs, Movie startingNode) {
         this.data = data;
         
         this.graph = graph;
@@ -24,16 +24,16 @@ public class Optimiser {
         this.startNode = startingNode;
         
         this.shortestPath = new Double[this.graph.nodes.size()];
-        initialiseShortestPath(startingNode);
+        initialiseShortestPath(startingNode.getTitle());
+        
         this.previousNode = new ArrayList<>(this.graph.getNodes().size());
         initialisePreviousNode();
     }
 
-
     private void initialiseShortestPath(String startNode) {
         for (int i = 0; i < this.graph.getNodes().size(); i++) {
             if (i == this.indexStartNode) {
-                this.shortestPath[i] = Double.parseDouble(this.data.get(indexStartNode)[1]);
+                this.shortestPath[i] = this.data.get(indexStartNode).getRating();
             } else {
                 this.shortestPath[i] = Double.MAX_VALUE;
             }
@@ -46,19 +46,47 @@ public class Optimiser {
         }
     }
 
-    public void optimise() {
+    private Double[] shortestPath() {
         // https://en.wikipedia.org/wiki/Topological_sorting#Application_to_shortest_path_finding
 
         for (int i = this.indexStartNode; i < this.graph.getNodes().size(); i++) {
-            for (DirectedGraphArc<String> arc : this.graph.getOutArcs(this.graph.getNodes().get(i))) {
+            for (DirectedGraphArc<Movie> arc : this.graph.getOutArcs(this.graph.getNodes().get(i))) {
                 int j = this.graph.getNodes().indexOf(arc.getTo());
 
                 if (this.shortestPath[j] > this.shortestPath[i] + arc.getWeight()) {
                     this.shortestPath[j] = this.shortestPath[i] + arc.getWeight();
                     this.previousNode.set(j, this.graph.getNodes().get(i));
-                }
+                } 
             }
                 
+        }
+        return this.shortestPath;
+    }
+
+    private Double[] longestPath() {
+        // https://en.wikipedia.org/wiki/Topological_sorting#Application_to_shortest_path_finding
+
+        for (int i = this.indexStartNode; i < this.graph.getNodes().size(); i++) {
+            for (DirectedGraphArc<Movie> arc : this.graph.getOutArcs(this.graph.getNodes().get(i))) {
+                int j = this.graph.getNodes().indexOf(arc.getTo());
+
+                if (this.longestPath[j] < this.longestPath[i] + arc.getWeight()) {
+                    this.longestPath[j] = this.longestPath[i] + arc.getWeight();
+                    this.previousNode.set(j, this.graph.getNodes().get(i));
+                } 
+            }
+                
+        }
+        return this.longestPath;
+    }
+
+    public Double[] optimise(boolean shortestPath) {
+        // https://en.wikipedia.org/wiki/Topological_sorting#Application_to_shortest_path_finding
+
+        if (shortestPath) {
+            return shortestPath();
+        } else {
+            return longestPath();
         }
     }
 }

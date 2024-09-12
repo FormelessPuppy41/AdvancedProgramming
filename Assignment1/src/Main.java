@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Comparator;
 
 public class Main {
     
@@ -18,47 +19,84 @@ public class Main {
         main.processData();
 
         // ------------- Run Assignment 1a -------------
-        main.runAssignment1a();
+        //main.runAssignment1a();
 
         // ------------- Run Assignment 1b -------------
-        // main.runAssignment1b();
+        String searchMovieTitle = "M";
+        Double searchRating = null;
+        Integer searchDuration = null;
+        Integer searchStartTime = null;
+        //main.runAssignment1b(searchMovieTitle, searchRating, searchDuration, searchStartTime);
 
         // ------------- Run Assignment 1d -------------
-        // main.runAssignment1d();
+        int startingNodeIndex = 1;
+        main.runAssignment1d(startingNodeIndex);
     }
 
     //TODO: Add these methods in a separate class: Assignments.java class Same for the processData method
 
     // ------------- Assignment 1a -------------
     private void runAssignment1a() {
-        Sorter2 sorter = new Sorter2();
+        System.out.println("************************************");
+        System.out.println("Assignment 1a: Sorting movie data based on start time");
+        
+        Sorter sorter = new Sorter();
+        Comparator<Movie> movieComparatorAscending = MovieComparators.byStartTime(true);
 
-        sorter.quickSort(this.file1, 1, this.file1.size() - 1);
-        sorter.quickSort(this.file2, 1, this.file2.size() - 1);
-        sorter.quickSort(this.file3, 1, this.file3.size() - 1);
-        sorter.quickSort(this.file4, 1, this.file4.size() - 1);
-        sorter.quickSort(this.file5, 1, this.file5.size() - 1);
+        sorter.sortData(this.file1, movieComparatorAscending, "File1");
+        sorter.sortData(this.file2, movieComparatorAscending, "File2");
+        sorter.sortData(this.file3, movieComparatorAscending, "File3");
+        sorter.sortData(this.file4, movieComparatorAscending, "File4");
+        sorter.sortData(this.file5, movieComparatorAscending, "File5");
 
-        //utilities.measureTime(data -> sorter.quickSort(this.file1, 1, this.file1.size() - 1), this.file1, false, false);
-        //utilities.measureTime(data -> sorter.quickSort(this.file2, 1, this.file2.size() - 1), this.file2, false, false);
-        //utilities.measureTime(data -> sorter.quickSort(this.file3, 1, this.file3.size() - 1), this.file3, false, false);
-        // utilities.measureTime(data -> sorter.quickSort(this.file4, 1, this.file4.size() - 1), this.file4, false, false);
-        // utilities.measureTime(data -> sorter.quickSort(this.file5, 1, this.file5.size() - 1), this.file5, false, false);
+        // utilities.measureTime(data -> sorter.sortData(this.file1, "File1"), this.file1, false, false);
+        // utilities.measureTime(data -> sorter.sortData(this.file2, "File2"), this.file2, false, false);
+        // utilities.measureTime(data -> sorter.sortData(this.file3, "File3"), this.file3, false, false);
+        // utilities.measureTime(data -> sorter.sortData(this.file4, "File4"), this.file4, false, false);
+        // utilities.measureTime(data -> sorter.sortData(this.file5, "File5"), this.file5, false, false);
 
         //outputData(this.file1);
     }
 
     // ------------- Assignment 1b -------------
-    private void runAssignment1b() {
-        Sorter2 sorter = new Sorter2();
-        sorter.quickSort(file5, 1, file5.size() - 1);
+    private void runAssignment1b(String searchTitle, Double searchRating, Integer searchDuration, Integer searchStartTime) {
+        System.out.println("************************************");
+        System.out.println("Assignment 1b: Searching for a movie based on title and rating");
 
+        List<Movie> currentFile = this.file1;
 
+        Sorter sorter = new Sorter();
+        Comparator<Movie> movieComparatorTitleRatingAscending = MovieComparators.byTitleThenRating(true);
+        
+        sorter.sortData(currentFile, movieComparatorTitleRatingAscending, "File5");
+        // outputData(currentFile);
+
+        // Create a searcher instance and search for the movie title.
+        Searcher searcher = new Searcher();
+        searcher.findMovie(currentFile, false, false, searchTitle, searchRating, searchDuration, searchStartTime);
+        
     }
 
     // ------------- Assignment 1d -------------
-    private void runAssignment1d() {
-        Sorter2 sorter = new Sorter2();
+    private void runAssignment1d(int startingNodeIndex) {
+        System.out.println("************************************");
+        System.out.println("Assignment 1d: Optimising movie schedule based on the start time");
+
+        List<Movie> currentFile = this.file1;
+
+        Sorter sorter = new Sorter();
+        Comparator<Movie> movieComparatorStartTimeAscending = MovieComparators.byStartTime(true);
+        sorter.sortData(currentFile, movieComparatorStartTimeAscending, "File1");
+
+        Movie startingNode = currentFile.get(startingNodeIndex); // Must be from the sorted data.
+        
+        DirectedGraphInitialiser graphInitialiser = new DirectedGraphInitialiser(currentFile, startingNode, sorter);
+        
+        // Create a new Optimiser instance to optimise the movie schedule
+        Optimiser optimiser = new Optimiser(currentFile, graphInitialiser.getGraph(), graphInitialiser.getArcs(), startingNode);
+        Double[] path = optimiser.optimise(true);
+        
+        System.out.println(path);
     }
 
     public void processData() {
