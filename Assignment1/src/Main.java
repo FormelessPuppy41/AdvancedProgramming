@@ -96,10 +96,9 @@ public class Main {
         Optimiser optimiser = new Optimiser(currentFile, graphInitialiser.getGraph(), graphInitialiser.getArcs(), startingNode);
         //Double[] path = optimiser.optimise(true);
         
-        utilities.measureTime(data -> optimiser.optimise(true), currentFile, false, false);
+        utilities.measureTime(data -> optimiser.optimise(false), currentFile, false, false);
         
-        List<Movie> sequence = optimiser.getOptimalMovieSequence();
-        System.out.println(sequence.toString());
+        List<Movie> sequence = optimiser.getOptimalMovieSequence(true, 1499);
 
         //FIXME: fix the output of the sequence.
     }
