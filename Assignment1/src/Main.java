@@ -30,10 +30,13 @@ public class Main {
 
         // ------------- Run Assignment 1d -------------
         int startingNodeIndex = 1;
-        main.runAssignment1d(startingNodeIndex);
+        //main.runAssignment1d(startingNodeIndex);
 
         // ------------- Run Assignment 1e -------------
         //main.runAssignment1e();
+
+        // ------------- Run Assignment 1f -------------
+        main.runAssignment1f();
     }
 
     //TODO: Add these methods in a separate class: Assignments.java class Same for the processData method
@@ -128,6 +131,23 @@ public class Main {
         utilities.measureTime(data -> optimiser.findPathDisregardStartingIndex(false, true), currentFile, false, false);
         
         //List<Movie> sequence = optimiser.getOptimalMovieSequence(1499);
+    }
+
+    private void runAssignment1f() {
+        System.out.println("************************************");
+        System.out.println("Assignment 1f: Finding the minimum number of rooms required to show all movies");
+
+        List<Movie> currentFile = this.file1;
+
+        // Sort the data based on the start time - Topological sort
+        Sorter sorter = new Sorter();
+        Comparator<Movie> movieComparatorStartTimeAscending = MovieComparators.byStartTime(true);
+        sorter.sortData(currentFile, movieComparatorStartTimeAscending, "File1");
+
+        // Create a new CinemaRoomAllocator instance to allocate rooms
+        CinemaScheduler cinemaRoomAllocator = new CinemaScheduler(currentFile);
+
+        utilities.measureTime(data -> cinemaRoomAllocator.findMinimumRequiredRooms(), currentFile, false, false);
     }
 
 

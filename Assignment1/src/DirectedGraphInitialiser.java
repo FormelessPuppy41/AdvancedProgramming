@@ -72,8 +72,8 @@ public class DirectedGraphInitialiser {
                 int nextStartTime = nextNode.getStartTime();
                 double nextRating = nextNode.getRating();
     
-                // Ensure next movie can be watched after the current movie
-                if (currentStartTime + currentDuration <= nextStartTime) {
+                // Ensure next movie can be watched after the current movie and the wait is a maximum of 15 minutes.
+                if (currentStartTime + currentDuration <= nextStartTime && currentStartTime + currentDuration + 15 >= nextStartTime) {
                     // Only add arc if both nodes are already in the graph
                     if (this.graph.getNodes().contains(currentNode) && this.graph.getNodes().contains(nextNode)) {
                         // Add the arc between current and next node

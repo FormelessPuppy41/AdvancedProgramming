@@ -314,9 +314,6 @@ public class Optimiser {
         HashMap <Movie, List<Movie>> movieSequence = new HashMap<>(); // movie, moviePath, score
 
         for (Movie movie : this.graph.nodes) {
-
-            //if (this.graph.nodes.indexOf(movie) < 100 || this.graph.nodes.indexOf(movie) > 101) {continue;} else {
-            
             System.out.println("Checking path for index: " + this.graph.nodes.indexOf(movie) + ", Movie: " + movie.toString());
             // Reset the starting node
             setStartNode(movie);
@@ -336,14 +333,12 @@ public class Optimiser {
                 // List<Movie> sequence = newOptimiser.getOptimalMovieSequence(Arrays.asList(path).indexOf(minValue));
                 movieScore.put(movie, maxValue); // add movie, sequence, and score to hashmap
             }
-            //}
         }
-        //System.out.println("-----------------");
-        //System.out.println("MovieScores:");
-        //System.out.println(movieScore.toString());
+
         Movie optimalStartingMovie = Collections.max(movieScore.entrySet(), (entry1, entry2) -> entry1.getValue().compareTo(entry2.getValue())).getKey(); // compare the scores and return the movie with the highest score.
         List<Movie> optimalSequence = movieSequence.get(optimalStartingMovie);
 
+        // log output
         System.out.println("-----------------");
         System.out.println("The optimal starting movie is: " + optimalStartingMovie.toString());
         System.out.println("The optimal sequence is: " + optimalSequence.toString());
@@ -353,6 +348,7 @@ public class Optimiser {
         this.previousNode = optimalSequence;
         this.startNode = optimalStartingMovie;
 
+        // Retrieve the optimal movie sequence.
         List<Movie> sequence = getOptimalMovieSequence();
 
         return sequence;
