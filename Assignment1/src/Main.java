@@ -31,6 +31,9 @@ public class Main {
         // ------------- Run Assignment 1d -------------
         int startingNodeIndex = 1;
         main.runAssignment1d(startingNodeIndex);
+
+        // ------------- Run Assignment 1e -------------
+        //main.runAssignment1e();
     }
 
     //TODO: Add these methods in a separate class: Assignments.java class Same for the processData method
@@ -96,12 +99,37 @@ public class Main {
         Optimiser optimiser = new Optimiser(currentFile, graphInitialiser.getGraph(), graphInitialiser.getArcs(), startingNode);
         //Double[] path = optimiser.optimise(true);
         
-        utilities.measureTime(data -> optimiser.optimise(false), currentFile, false, false);
+        utilities.measureTime(data -> optimiser.findPath(false, false), currentFile, false, false);
         
-        List<Movie> sequence = optimiser.getOptimalMovieSequence(true, 1499);
-
-        //FIXME: fix the output of the sequence.
+        List<Movie> sequence = optimiser.getOptimalMovieSequence();
     }
+
+    // ------------- Assignment 1e -------------
+    private void runAssignment1e() {
+        System.out.println("************************************");
+        System.out.println("Assignment 1e: Optimising movie schedule based on a time limit (6h)");
+
+        List<Movie> currentFile = this.file1;
+
+        // Sort the data based on the start time - Topological sort
+        Sorter sorter = new Sorter();
+        Comparator<Movie> movieComparatorStartTimeAscending = MovieComparators.byStartTime(true);
+        sorter.sortData(currentFile, movieComparatorStartTimeAscending, "File1");
+
+        Movie startingNode = currentFile.get(0); // Must be from the sorted data.
+        System.out.println(startingNode.toString());
+
+        DirectedGraphInitialiser graphInitialiser = new DirectedGraphInitialiser(currentFile, currentFile.get(1), sorter);
+        
+        // Create a new Optimiser instance to optimise the movie schedule
+        Optimiser optimiser = new Optimiser(currentFile, graphInitialiser.getGraph(), graphInitialiser.getArcs(), startingNode);
+        //Double[] path = optimiser.optimise(true);
+        
+        utilities.measureTime(data -> optimiser.findPathDisregardStartingIndex(false, true), currentFile, false, false);
+        
+        //List<Movie> sequence = optimiser.getOptimalMovieSequence(1499);
+    }
+
 
     public void processData() {
 
