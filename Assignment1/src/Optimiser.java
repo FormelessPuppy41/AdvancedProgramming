@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Arrays;
 
 /**
- * Optimiser class is responsible for finding the optimal path through a DirectedGraph of Movies.
- * The optimisation can be for the shortest or longest path based on movie ratings.
+ * The Optimiser class is responsible for finding the optimal path through a DirectedGraph of Movies.
+ * It can optimize for the shortest or longest path based on movie ratings and total duration constraints.
  * 
  * @author Berend Quist 611968bq
  */
@@ -18,9 +18,6 @@ public class Optimiser {
     protected Double[] longestPath;
 
     protected List<Movie> previousNode;
-    protected List<Movie> nextNode;
-    protected List<Movie> restartPreviousNode;
-
     protected int[] totalTime;
 
     protected Movie startNode;
@@ -28,6 +25,7 @@ public class Optimiser {
 
     protected final List<Movie> data;
     protected boolean dataSorted = false;
+    protected final int numberOfNodes;
 
     protected int MAX_DURATION = 360;
 
@@ -46,6 +44,7 @@ public class Optimiser {
         this.startNode = startingNode;
         
         this.indexStartNode = this.graph.getNodes().indexOf(this.startNode);
+        this.numberOfNodes = this.graph.getNodes().size();
         
         initialiseSequencialNodes();
         initialisePaths();
@@ -53,16 +52,10 @@ public class Optimiser {
     }
 
     /**
-     * Initializes the previousNode and nextNode lists with null values.
+     * Initializes the previousNode list with null values.
      */
     private void initialiseSequencialNodes() {
-        int numNodes = this.graph.getNodes().size();
-        this.previousNode = new ArrayList<>(Collections.nCopies(numNodes, null));
-        
-        for (int i = 0; i < this.graph.getNodes().size(); i++) {
-            this.previousNode.set(i, null);
-            //this.nextNode.set(i, null);
-        }
+        this.previousNode = new ArrayList<>(Collections.nCopies(this.numberOfNodes, null));
     }
 
     /**
@@ -70,29 +63,29 @@ public class Optimiser {
      * Sets the path values for the starting node.
      */
     private void initialisePaths() {
-        this.shortestPath = new Double[this.graph.nodes.size()];
-        this.longestPath = new Double[this.graph.nodes.size()];
+        this.shortestPath = new Double[this.numberOfNodes];
+        this.longestPath = new Double[this.numberOfNodes];
 
         Arrays.fill(this.shortestPath, Double.MAX_VALUE);
         Arrays.fill(this.longestPath, Double.MIN_VALUE);
 
-        Double rating = this.data.get(indexStartNode).getRating();
+        Double startRating = this.startNode.getRating();
 
-        this.shortestPath[this.indexStartNode] = rating;
-        this.longestPath[this.indexStartNode] = rating;
+        this.shortestPath[this.indexStartNode] = startRating;
+        this.longestPath[this.indexStartNode] = startRating;
     }
 
     /**
      * Initializes the totalTime array with default values.
      */
     private void initialiseTimes() {
-        this.totalTime = new int[this.graph.nodes.size()];
+        this.totalTime = new int[this.numberOfNodes];
         Arrays.fill(this.totalTime, 0);
         this.totalTime[this.indexStartNode] = this.startNode.getDuration();
     }
 
     /**
-     * Resets the starting node for path calculations.
+     * Resets the starting node for path calculations and reinitializes paths and times.
      * 
      * @param newStartNode The new starting node.
      */
@@ -100,20 +93,17 @@ public class Optimiser {
         this.startNode = newStartNode;
         this.indexStartNode = this.graph.getNodes().indexOf(newStartNode);
 
-        // Reset paths and times
         initialisePaths();
         initialiseTimes(); 
         initialiseSequencialNodes();
     }
 
-
     /**
-     * Finds either the shortest or longest path from the starting node.
-     * 
-     * For the mathematical source: https://en.wikipedia.org/wiki/Topological_sorting#Application_to_shortest_path_finding
+     * Finds the shortest or longest path from the starting node.
      * 
      * @param shortest If true, finds the shortest path, otherwise finds the longest path.
-     * @return The array representing the shortest or longest path distances.
+     * @param timeLimit If true, considers the time constraint (maximum duration).
+     * @return An array representing the shortest or longest path distances.
      */
     private Double[] findPaths(boolean shortest, boolean timeLimit) {
         if (!timeLimit) {
@@ -123,51 +113,50 @@ public class Optimiser {
         for (Movie movie : this.graph.nodes) {
             int i = this.graph.nodes.indexOf(movie);
             
-            // Skip the nodes before the starting node
             if (i < this.indexStartNode) {
-                continue;
+                continue;  // Skip nodes before the starting node
             }
 
-            // Loop through the arcs from the current node
+            // Iterate over all arcs (edges) of the current node
             for (DirectedGraphArc<Movie> arc : this.graph.getOutArcs(movie)) {
-                int j = this.graph.nodes.indexOf(arc.getTo());
-                
-                // Skip the nodes before the starting node
-                if (j < this.indexStartNode || !isArcValid(arc)) {
-                    continue;
-                }
-                
-                // Skip the nodes that are before the end time of the starting node
-                if (this.startNode.getStartTime() + this.startNode.getDuration() >= arc.getTo().getStartTime()) {
-                    continue;
-                }
- 
-                int totalDuration = arc.getTo().getStartTime() + arc.getTo().getDuration() - this.startNode.getStartTime();
-                if (totalDuration <= MAX_DURATION) {
-                    if (shortest) {
-                        // Shortest path: Change the shortest path to j, to the path to i + arc(i, j) if the current path to j is greater  then the path to i + arc(i, j).
-                        // That is, minimize total length.
-                        updateShortestPath(i,j,arc);
-                    } else {
-                        // Longest path: Change the longest path to j, to the path to i + arc(i, j) if the current path to j is less than the path to i + arc(i, j).
-                        // That is, maximize total length.
-                        updateLongestPath(i,j,arc);
-                    }
-                    this.totalTime[j] = totalDuration;
-                } else {
-                    // If the total duration is greater than 6 hours, skip the node.
-                    continue;
-                }
+                handleArcForPaths(i, arc, shortest);
             }
         }
-        // Return the shortest or longest path
+        
         return shortest ? this.shortestPath : this.longestPath;
     }
 
     /**
-     * Checks if an arc is valid by comparing start and end times of movies to the starting node.
+     * Handles an arc for updating the shortest or longest path.
      * 
-     * That is, StartNode.starttime + StartNode.duration < Arc.to.starttime.
+     * @param i The index of the current movie.
+     * @param arc The arc representing the relationship to the next movie.
+     * @param shortest If true, calculates the shortest path; otherwise, calculates the longest path.
+     */
+    private void handleArcForPaths(int i, DirectedGraphArc<Movie> arc, boolean shortest) {
+        int j = this.graph.nodes.indexOf(arc.getTo());
+        
+        // Skip invalid arcs or nodes before the start node
+        if (j < this.indexStartNode || !isArcValid(arc)) {
+            return;
+        }
+        
+        int totalDuration = arc.getTo().getStartTime() + arc.getTo().getDuration() - this.startNode.getStartTime();
+        if (totalDuration > MAX_DURATION) {
+            return;
+        }
+
+        if (shortest) {
+            updateShortestPath(i, j, arc);
+        } else {
+            updateLongestPath(i, j, arc);
+        }
+
+        this.totalTime[j] = totalDuration;
+    }
+
+    /**
+     * Checks if an arc is valid by comparing start and end times of movies.
      * 
      * @param arc The directed graph arc to be checked.
      * @return true if the arc is valid, false otherwise.
@@ -184,8 +173,6 @@ public class Optimiser {
      * @param arc The directed graph arc between nodes.
      */
     private void updateShortestPath(int i, int j, DirectedGraphArc<Movie> arc) {
-        // Update the shortest path to j, to the path to i + arc(i, j) if the current path to j is greater than the path to i + arc(i, j).
-        // That is, minimize total length.
         if (this.shortestPath[j] > this.shortestPath[i] + arc.getWeight()) {
             this.shortestPath[j] = this.shortestPath[i] + arc.getWeight();
             this.previousNode.set(j, this.graph.nodes.get(i));
@@ -200,8 +187,6 @@ public class Optimiser {
      * @param arc The directed graph arc between nodes.
      */
     private void updateLongestPath(int i, int j, DirectedGraphArc<Movie> arc) {
-        // Update the longest path to j, to the path to i + arc(i, j) if the current path to j is less than the path to i + arc(i, j).
-        // That is, maximize total length.
         if (this.longestPath[j] < this.longestPath[i] + arc.getWeight()) {
             this.longestPath[j] = this.longestPath[i] + arc.getWeight();
             this.previousNode.set(j, this.graph.nodes.get(i));
@@ -209,150 +194,194 @@ public class Optimiser {
     }
 
     /**
-     * Optimises the movie sequence by finding either the shortest or longest path.
+     * Finds the shortest or longest path and returns the calculated path array.
      * 
      * @param shortestPath If true, finds the shortest path; otherwise, finds the longest path.
      * @return The array representing the shortest or longest path.
      */
     public Double[] findPath(boolean shortestPath, boolean timeLimit) {
         System.out.println("-----------------");
-        System.out.println("Optimising movie schedule");
+        System.out.println("Optimising movie schedule...");
 
-        // Find the shortest or longest path
         Double[] path = findPaths(shortestPath, timeLimit);
 
-        // Log the shortest or longest path
         if (shortestPath) {
-            double minValue = findMinValue(path);
-            System.out.println("The shortest path is: " + minValue + ", at index: " + Arrays.asList(path).indexOf(findMinValue(path)));
+            logPath(shortestPath, path);
         } else {
-            double maxValue = findMaxValue(path);
-            System.out.println("The longest path is: " + maxValue + ", at index: " + Arrays.asList(path).indexOf(findMaxValue(path)));
+            logPath(shortestPath, path);
         }
 
         System.out.println("Movie schedule optimised.");
-        //System.out.println("The optimal path is: " + this.previousNode.toString());
-
         return path;
     }
 
     /**
-     * Retrieves the optimal movie sequence based on the previously calculated paths.
+     * Logs the shortest or longest path to the console.
      * 
-     * @param previousOrNext If true, uses previousNode list; if false, uses nextNode list.
-     * @param pathIndex The index of the starting node for the sequence.
+     * @param pathType The type of path ("shortest" or "longest").
+     * @param path The calculated path array.
+     */
+    private void logPath(boolean shortestPath, Double[] path) {
+        double value = shortestPath ? findMinValue(path) : findMaxValue(path);
+        String pathType = shortestPath ? "shortest" : "longest";
+        System.out.println("The " + pathType + " path is: " + value + ", at index: " + Arrays.asList(path).indexOf(value));
+    }
+
+    /**
+     * Finds the optimal movie sequence, disregarding the starting index and testing all possible starting points.
+     * The method evaluates both shortest and longest paths and stores the best sequence found.
+     * 
+     * @param shortestPath If true, finds the shortest path; otherwise, finds the longest path.
+     * @param timeLimit If true, applies a time constraint for the maximum duration.
+     * @return The list of movies in the optimal sequence.
+     */
+    public List<Movie> findPathDisregardStartingIndex(boolean shortestPath, boolean timeLimit) {
+        HashMap<Movie, Double> movieScores = new HashMap<>();
+        HashMap<Movie, List<Movie>> movieSequences = new HashMap<>();
+
+        evaluateAllStartingNodes(shortestPath, timeLimit, movieScores, movieSequences);
+
+        Movie optimalStartingMovie = getOptimalStartingMovie(movieScores);
+        List<Movie> optimalSequence = movieSequences.get(optimalStartingMovie);
+
+        logOptimalPathResult(optimalStartingMovie, optimalSequence, movieScores);
+
+        // Set the optimal starting node and sequence for further usage
+        this.previousNode = optimalSequence;
+        this.startNode = optimalStartingMovie;
+
+        return getOptimalMovieSequence();
+    }
+
+    /**
+     * Evaluates the paths for all starting nodes in the graph, storing the best sequence and scores for each node.
+     * 
+     * @param shortestPath If true, evaluates paths for the shortest path; otherwise, evaluates the longest path.
+     * @param timeLimit If true, applies a time constraint for the maximum duration.
+     * @param movieScores A map to store the score (min or max path value) for each starting movie.
+     * @param movieSequences A map to store the corresponding path sequence for each starting movie.
+     */
+    private void evaluateAllStartingNodes(
+            boolean shortestPath, boolean timeLimit,
+            HashMap<Movie, Double> movieScores,
+            HashMap<Movie, List<Movie>> movieSequences
+        ) {
+        for (Movie movie : this.graph.nodes) {
+            System.out.println("Checking path for index: " + this.graph.nodes.indexOf(movie) + ", Movie: " + movie);
+
+            setStartNode(movie);  // Reset starting node to the current movie
+            Double[] path = findPaths(shortestPath, timeLimit);  // Find the path for the current node
+
+            movieSequences.put(movie, new ArrayList<>(this.previousNode));  // Store sequence
+            
+            // Store the score (min or max path value) for the current movie
+            if (shortestPath) {
+                movieScores.put(movie, findMinValue(path));
+            } else {
+                movieScores.put(movie, findMaxValue(path));
+            }
+        }
+    }
+
+    /**
+     * Returns the movie node with the optimal score (min for shortest path, max for longest path).
+     * 
+     * @param movieScores A map containing the scores for each starting movie.
+     * @return The movie node with the best score.
+     */
+    private Movie getOptimalStartingMovie(HashMap<Movie, Double> movieScores) {
+        return Collections.max(movieScores.entrySet(), (entry1, entry2) -> entry1.getValue().compareTo(entry2.getValue())).getKey();
+    }
+
+    /**
+     * Logs the results of the optimal path calculation, displaying the starting movie, sequence, and score.
+     * 
+     * @param optimalStartingMovie The movie node that was determined to be the best starting point.
+     * @param optimalSequence The sequence of movies representing the optimal path.
+     * @param movieScores A map containing the scores for each starting movie.
+     */
+    private void logOptimalPathResult(Movie optimalStartingMovie, List<Movie> optimalSequence, HashMap<Movie, Double> movieScores) {
+        System.out.println("-----------------");
+        System.out.println("The optimal starting movie is: " + optimalStartingMovie);
+        System.out.println("The optimal sequence is: " + optimalSequence);
+        System.out.println("The optimal score is: " + movieScores.get(optimalStartingMovie));
+    }
+
+    /**
+     * Retrieves the optimal movie sequence based on the previously calculated paths.
+     * Ensures the starting node is included in the sequence and reverses the list for correct ordering.
+     * 
      * @return A list of movies in the optimal sequence.
      */
     public List<Movie> getOptimalMovieSequence() {
         System.out.println("-----------------");
         System.out.println("Finding the optimal movie sequence");
-        
-        // Get the correct sequence depending on the previousOrNext input
-        List<Movie> sequence = this.previousNode;
 
-        //System.out.println("The sequence is: " + sequence.toString());
+        List<Movie> optimalSequence = buildOptimalSequence(this.previousNode);
 
-        validateSequence();
-
-        // Find the optimal sequence
-        List<Movie> optimalSequence = buildOptimalSequence(sequence);
-
-        // Add the starting node to the sequence
+        // Ensure the start node is part of the sequence -> add if absent
         if (!optimalSequence.contains(this.startNode)) {
             optimalSequence.add(this.startNode);
         }
 
-        // Reverse the sequence -> start from the starting node and go down the path.
-        Collections.reverse(optimalSequence);
-        System.out.println("The optimal sequence is: " + optimalSequence.toString());
+        Collections.reverse(optimalSequence);  // Reverse to get correct order
+        System.out.println("The optimal sequence is: " + optimalSequence);
 
         return optimalSequence;
     }
 
     /**
-     * Validates the sequence list to ensure it's not null or empty.
+     * Builds the optimal movie sequence by following the previous nodes list, starting from the last valid node.
      * 
-     * @param sequence The sequence to validate.
-     */
-    private void validateSequence() {
-        if (this.previousNode == null) {
-            throw new IllegalArgumentException("The sequence is empty. (null)");
-        } else if (this.previousNode.isEmpty()) {
-            throw new IllegalArgumentException("The sequence is empty. (isEmpty = True)");
-        }
-    }
-
-    /**
-     * Builds the optimal movie sequence from the given path.
-     * 
-     * @param sequence The list of previous or next nodes.
-     * @param startNodeIndex The index of the starting node.
+     * @param sequence The list of previous nodes representing the movie path.
      * @return A list of movies in the optimal sequence.
      */
     private List<Movie> buildOptimalSequence(List<Movie> sequence) {
         List<Movie> optimalSequence = new ArrayList<>();
-        
-        int index = this.graph.nodes.size() - 1;
 
-        while (sequence.get(index) == null) {
-            index = index - 1;
+        int index = findFirstNonNullIndex(sequence);
+        if (index == -1) {
+            return optimalSequence;  // No valid sequence found
         }
 
-        System.out.println("First value found at index: " + index + ", Movie: " + this.graph.getNodes().get(index).toString());
+        System.out.println("First value found at index: " + index + ", Movie: " + this.graph.getNodes().get(index));
 
-        while (sequence.get(index) != null && index < this.graph.nodes.size()) {
-            Movie currentNode = this.graph.getNodes().get(index);
-            optimalSequence.add(currentNode);
-            index = this.graph.getNodes().indexOf(sequence.get(index));
-        }
+        buildSequenceFromIndex(sequence, optimalSequence, index);
 
         return optimalSequence;
     }
 
-    public List<Movie> findPathDisregardStartingIndex(boolean shortestPath, boolean timeLimit) {
-        HashMap <Movie, Double> movieScore = new HashMap<>(); // movie, moviePath, score
-        HashMap <Movie, List<Movie>> movieSequence = new HashMap<>(); // movie, moviePath, score
-
-        for (Movie movie : this.graph.nodes) {
-            System.out.println("Checking path for index: " + this.graph.nodes.indexOf(movie) + ", Movie: " + movie.toString());
-            // Reset the starting node
-            setStartNode(movie);
-
-            // Find the shortest or longest path
-            Double[] path = findPaths(shortestPath, timeLimit);
-
-            // Store the movie and the previous node in a hashmap
-            movieSequence.put(movie, this.previousNode);
-
-            if (shortestPath) {
-                double minValue = findMinValue(path); // get min score value
-                // List<Movie> sequence = newOptimiser.getOptimalMovieSequence(Arrays.asList(path).indexOf(minValue));
-                movieScore.put(movie, minValue); // add movie, sequence, and score to hashmap
-            } else {
-                double maxValue = findMaxValue(path); // get max score value
-                // List<Movie> sequence = newOptimiser.getOptimalMovieSequence(Arrays.asList(path).indexOf(minValue));
-                movieScore.put(movie, maxValue); // add movie, sequence, and score to hashmap
+    /**
+     * Finds the first non-null index in the previous nodes list, which marks the start of the sequence.
+     * 
+     * @param sequence The list of previous nodes representing the movie path.
+     * @return The index of the first non-null element, or -1 if none is found.
+     */
+    private int findFirstNonNullIndex(List<Movie> sequence) {
+        for (int i = sequence.size() - 1; i >= 0; i--) {
+            if (sequence.get(i) != null) {
+                return i;
             }
         }
-
-        Movie optimalStartingMovie = Collections.max(movieScore.entrySet(), (entry1, entry2) -> entry1.getValue().compareTo(entry2.getValue())).getKey(); // compare the scores and return the movie with the highest score.
-        List<Movie> optimalSequence = movieSequence.get(optimalStartingMovie);
-
-        // log output
-        System.out.println("-----------------");
-        System.out.println("The optimal starting movie is: " + optimalStartingMovie.toString());
-        System.out.println("The optimal sequence is: " + optimalSequence.toString());
-        System.out.println("The optimal score is: " + movieScore.get(optimalStartingMovie));
-
-        // Set the starting node and previous node for the optimal sequence
-        this.previousNode = optimalSequence;
-        this.startNode = optimalStartingMovie;
-
-        // Retrieve the optimal movie sequence.
-        List<Movie> sequence = getOptimalMovieSequence();
-
-        return sequence;
+        return -1;
     }
+
+    /**
+     * Recursively builds the optimal sequence by following the path of previous nodes.
+     * 
+     * @param sequence The list of previous nodes.
+     * @param optimalSequence The list where the optimal sequence will be stored.
+     * @param startIndex The index to start building the sequence from.
+     */
+    private void buildSequenceFromIndex(List<Movie> sequence, List<Movie> optimalSequence, int startIndex) {
+        int index = startIndex;
+        while (index >= 0 && sequence.get(index) != null) { // Follow the path until null is reached or all nodes are visited
+            Movie currentNode = this.graph.getNodes().get(index);
+            optimalSequence.add(currentNode);
+            index = this.graph.getNodes().indexOf(sequence.get(index));
+        }
+    }
+
 
     /**
      * Finds the minimum value in a Double array.
@@ -385,4 +414,5 @@ public class Optimiser {
         }
         return maxValue;
     }
+
 }

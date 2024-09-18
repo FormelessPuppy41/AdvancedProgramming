@@ -1,80 +1,77 @@
-
 /**
- * A stopwatch accumulates time when it is running. You can repeatedly start and stop the stopwatch.
- * You can use a stopwatch to measure the running time of a program in both nanoseconds and milliseconds.
+ * A StopWatch accumulates time when it is running. You can start and stop it multiple times to 
+ * measure the total elapsed time. The stopwatch measures time in both nanoseconds and milliseconds.
  */
 public class StopWatch {
-    protected long elapsedTime; // Stores elapsed time in nanoseconds
-    protected long startTime; // Tracks the starting time when the stopwatch is running
-    protected boolean isRunning; // Tracks whether the stopwatch is currently running
+
+    protected long elapsedTime; // Accumulated elapsed time in nanoseconds
+    protected long startTime; // The time when the stopwatch was last started
+    protected boolean isRunning; // True if the stopwatch is currently running
 
     /**
-     * Constructs a stopwatch that is in the stopped state and has no accumulated time.
+     * Constructs a StopWatch that is initially stopped with zero accumulated time.
      */
     public StopWatch() {
-        reset();
+        reset(); // Initialize in a stopped state with zero elapsed time
     }
 
     /**
-     * Starts the stopwatch. If it's already running, nothing happens.
+     * Starts the stopwatch if it is not already running. If the stopwatch is running, no action is taken.
      */
     public void start() {
-        if (this.isRunning) {
-            return;
+        if (!isRunning) {
+            this.isRunning = true;
+            this.startTime = System.nanoTime(); // Record the current start time in nanoseconds
         }
-        this.isRunning = true;
-        this.startTime = System.nanoTime(); // Records start time in nanoseconds
     }
 
     /**
-     * Stops the stopwatch and accumulates the elapsed time. If it's not running, nothing happens.
+     * Stops the stopwatch and accumulates the time since it was last started. 
+     * If the stopwatch is not running, no action is taken.
      */
     public void stop() {
-        if (!this.isRunning) {
-            return;
+        if (isRunning) {
+            this.isRunning = false;
+            long endTime = System.nanoTime(); // Get the current time
+            this.elapsedTime += (endTime - this.startTime); // Add the time passed since the last start
         }
-        this.isRunning = false;
-        long endTime = System.nanoTime(); // Records the time when stopped
-        this.elapsedTime += (endTime - this.startTime); // Accumulates elapsed time
     }
 
     /**
-     * Resets the stopwatch to zero elapsed time and stops it.
+     * Resets the stopwatch to zero elapsed time and stops it if it's running.
      */
     public void reset() {
-        this.elapsedTime = 0;
-        this.isRunning = false;
+        this.elapsedTime = 0; // Reset elapsed time to zero
+        this.isRunning = false; // Ensure the stopwatch is stopped
     }
 
     /**
-     * Returns the total elapsed time in nanoseconds.
+     * Returns the total elapsed time in nanoseconds. If the stopwatch is running, it includes the time since it was last started.
      *
-     * @return elapsed time in nanoseconds
+     * @return The total elapsed time in nanoseconds.
      */
     public long getElapsedTimeInNano() {
-        if (this.isRunning) {
-            long endTime = System.nanoTime();
-            return this.elapsedTime + (endTime - this.startTime); // Returns the current total time if still running
-        } else {
-            return this.elapsedTime;
+        if (isRunning) {
+            long currentTime = System.nanoTime(); // Get the current time
+            return this.elapsedTime + (currentTime - this.startTime); // Include the time since the last start
         }
+        return this.elapsedTime; // Return the accumulated time
     }
 
     /**
-     * Returns the total elapsed time in milliseconds.
+     * Returns the total elapsed time in milliseconds, converting from nanoseconds.
      *
-     * @return elapsed time in milliseconds
+     * @return The total elapsed time in milliseconds.
      */
     public double getElapsedTimeInMilli() {
-        return getElapsedTimeInNano() / 1_000_000.0; // Converts nanoseconds to milliseconds
+        return getElapsedTimeInNano() / 1_000_000.0; // Convert nanoseconds to milliseconds
     }
 
     /**
-     * Outputs the elapsed time in both milliseconds and nanoseconds.
+     * Prints the total elapsed time in both milliseconds and nanoseconds.
      */
     public void output() {
         System.out.println("Elapsed time: " + getElapsedTimeInMilli() + " milliseconds (" + getElapsedTimeInNano() + " nanoseconds)");
     }
 
-    
 }

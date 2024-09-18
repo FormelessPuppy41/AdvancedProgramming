@@ -6,7 +6,7 @@ import java.util.HashMap;
  * based on the schedule of movies. It tracks the time slots occupied by movies
  * and calculates the minimum number of rooms required to avoid scheduling conflicts.
  * 
- * @author 611968bq Berend Quist 
+ * @author 611968bq - Berend Quist 
  */
 public class CinemaScheduler {
 

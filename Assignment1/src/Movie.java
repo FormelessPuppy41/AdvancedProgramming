@@ -1,14 +1,12 @@
-
 /**
- * A class representing a movie with a title, rating, duration and start time.
+ * A class representing a movie with a title, rating, duration, and start time.
  * 
- * The class also contains a method to: 
- * - create a partial movie object with the given values.
- * - compare two movies based on their title, rating, duration and start time.
- * - return a string representation of the movie.
+ * The class provides methods to:
+ * - Create a partial movie object with the given values, using default values where necessary.
+ * - Compare two movies based on their title, rating, duration, and start time.
+ * - Return a string representation of the movie.
  * 
  * @author 611968bq - Berend Quist
- * 
  */
 public class Movie {
     protected final String title;
@@ -17,12 +15,12 @@ public class Movie {
     protected final int startTime;
 
     /**
-     * Create a new movie object with the given values.
+     * Constructs a new movie object with the given values.
      * 
-     * @param title : the title of the movie
-     * @param rating : the rating of the movie
-     * @param duration : the duration of the movie
-     * @param startTime : the start time of the movie
+     * @param title    The title of the movie.
+     * @param rating   The rating of the movie.
+     * @param duration The duration of the movie in minutes.
+     * @param startTime The start time of the movie in minutes (from 00:00).
      */
     public Movie(String title, Double rating, int duration, int startTime) {
         this.title = title;
@@ -32,13 +30,14 @@ public class Movie {
     }
 
     /**
-     * Create a new partial movie object with the given values, not all values need to be filled in. Use 'Null'. If a value is null, use the default value.
+     * Creates a new partial movie object with the given values.
+     * If any value is null, it uses a default value.
      * 
-     * @param title : the title of the movie
-     * @param rating : the rating of the movie
-     * @param duration : the duration of the movie
-     * @param startTime : the start time of the movie
-     * @return : a new movie object with the given values
+     * @param title     The title of the movie (default: empty string).
+     * @param rating    The rating of the movie (default: 0.0).
+     * @param duration  The duration of the movie in minutes (default: 0).
+     * @param startTime The start time of the movie in minutes (default: 0).
+     * @return A new movie object with the provided or default values.
      */
     public static Movie createPartialMovie(String title, Double rating, Integer duration, Integer startTime) {
         // Use default values if null is passed
@@ -52,70 +51,80 @@ public class Movie {
     }
 
     /**
-     * Get the title of the movie.
-     * @return : the title of the movie
+     * Gets the title of the movie.
+     * 
+     * @return The title of the movie.
      */
     public String getTitle() {
         return this.title;
     }
 
     /**
-     * Get the rating of the movie.
-     * @return : the rating of the movie
+     * Gets the rating of the movie.
+     * 
+     * @return The rating of the movie.
      */
     public Double getRating() {
         return this.rating;
     }
 
     /**
-     * Get the duration of the movie.
-     * @return : the duration of the movie
+     * Gets the duration of the movie.
+     * 
+     * @return The duration of the movie in minutes.
      */
     public int getDuration() {
         return this.duration;
     }
 
     /**
-     * Get the start time of the movie.
-     * @return : the start time of the movie
+     * Gets the start time of the movie.
+     * 
+     * @return The start time of the movie in minutes.
      */
     public int getStartTime() {
         return this.startTime;
     }
 
     /**
-     * Compare two movies based on their title, rating, duration and start time.
+     * Compares two movies based on their title (first character), rating, duration, and start time.
+     * If the titles are the same, it will compare by rating. If the ratings are the same,
+     * it will compare by duration, and if durations are the same, it will compare by start time.
      * 
-     * @param other : the other movie to compare to
-     * @return : a negative integer, zero, or a positive integer as this movie is less than, equal to, or greater than the other movie
+     * @param other The other movie to compare to.
+     * @return A negative integer, zero, or a positive integer as this movie is less than, equal to,
+     *         or greater than the other movie.
      */
     public int compareTo(Movie other) {
-        // First, compare by title (only use the first character)
-        char firstLetterMovie1 = this.title.toLowerCase().charAt(0);
-        char firstLetterMovie2 = other.title.toLowerCase().charAt(0);
+        int result = compareByTitle(other);
         
-        int result = Character.compare(firstLetterMovie1, firstLetterMovie2);
+        if (result == 0) result = Double.compare(this.rating, other.rating);
+        if (result == 0) result = Integer.compare(this.duration, other.duration);
+        if (result == 0) result = Integer.compare(this.startTime, other.startTime);
         
-        // If titles are the same, compare by rating
-        if (result == 0) {result = Double.compare(this.rating, other.rating);}
-        
-        // If ratings are the same, compare by duration
-        if (result == 0) {result = Integer.compare(this.duration, other.duration);}
-    
-        // If durations are the same, compare by start time
-        if (result == 0) {result = Integer.compare(this.startTime, other.startTime);}
-    
-        // Return the final comparison result
         return result;
     }
 
     /**
-     * Return a string representation of the movie.
+     * Compares two movies based on their titles' first characters.
      * 
-     * @return : a string representation of the movie
+     * @param other The other movie to compare.
+     * @return A negative integer, zero, or a positive integer based on the title comparison.
      */
-    public String toString() {
-        return this.title + ", " + this.rating + ", " + this.duration + ", " + this.startTime;
+    private int compareByTitle(Movie other) {
+        char firstLetterMovie1 = this.title.toLowerCase().charAt(0);
+        char firstLetterMovie2 = other.title.toLowerCase().charAt(0);
+        return Character.compare(firstLetterMovie1, firstLetterMovie2);
     }
-    
+
+    /**
+     * Returns a string representation of the movie.
+     * 
+     * @return A string containing the title, rating, duration, and start time of the movie.
+     */
+    @Override
+    public String toString() {
+        return String.format("%s, Rating: %.1f, Duration: %d min, Start Time: %d min", 
+                              this.title, this.rating, this.duration, this.startTime);
+    }
 }
