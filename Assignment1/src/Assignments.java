@@ -17,14 +17,18 @@ public class Assignments {
      * 
      * @param file  The file containing the list of movies.
      */
-    public void runAssignment1a(List<Movie> file, String keyTitle) {
-        System.out.println("************************************");
-        System.out.println("Assignment 1a: Sorting movie data based on start time");
+    public void runAssignment1a(List<Movie> file, String keyTitle, boolean measureTime) {
+        System.out.println("\n------------------------------------------------------------------------------------------------------");
+        System.out.println("A1a: Sorting movie data based on start time");
 
         Sorter sorter = new Sorter();
         Comparator<Movie> movieComparatorAscending = MovieComparators.byStartTime(true);
 
-        sorter.sortData(file, movieComparatorAscending, keyTitle);
+        if (measureTime) {
+            this.utilities.measureTime(data -> sorter.sortData(file, movieComparatorAscending, keyTitle), file, false, false);
+        } else {
+            sorter.sortData(file, movieComparatorAscending, keyTitle);
+        }
     }
 
     /**
@@ -36,14 +40,14 @@ public class Assignments {
      * @param searchDuration The duration of the movie to search.
      * @param searchStartTime The start time of the movie to search.
      */
-    public void runAssignment1b(List<Movie> file, String searchTitle, Double searchRating, Integer searchDuration, Integer searchStartTime) {
-        System.out.println("************************************");
-        System.out.println("Assignment 1b: Searching for a movie based on title and rating");
+    public void runAssignment1b(List<Movie> file, String keyTitle, String searchTitle, Double searchRating, Integer searchDuration, Integer searchStartTime) {
+        System.out.println("\n------------------------------------------------------------------------------------------------------");
+        System.out.println("A1b: Searching for a movie based on title and rating");
 
         Sorter sorter = new Sorter();
         Comparator<Movie> movieComparatorTitleRatingAscending = MovieComparators.byTitleThenRating(true);
 
-        sorter.sortData(file, movieComparatorTitleRatingAscending, "File5");
+        sorter.sortData(file, movieComparatorTitleRatingAscending, keyTitle);
 
         // Search for the movie
         Searcher searcher = new Searcher();
@@ -56,13 +60,13 @@ public class Assignments {
      * @param startingNodeIndex The index of the starting movie node.
      * @param file The list of movies to process.
      */
-    public void runAssignment1d(List<Movie> file, int startingNodeIndex) {
-        System.out.println("************************************");
-        System.out.println("Assignment 1d: Optimising movie schedule based on the start time");
+    public void runAssignment1d(List<Movie> file, String keyTitle, int startingNodeIndex) {
+        System.out.println("\n------------------------------------------------------------------------------------------------------");
+        System.out.println("A1d: Optimising movie schedule based on the start time");
 
         Sorter sorter = new Sorter();
         Comparator<Movie> movieComparatorStartTimeAscending = MovieComparators.byStartTime(true);
-        sorter.sortData(file, movieComparatorStartTimeAscending, "File1");
+        sorter.sortData(file, movieComparatorStartTimeAscending, keyTitle);
 
         Movie startingNode = file.get(startingNodeIndex);
 
@@ -72,7 +76,7 @@ public class Assignments {
         Optimiser optimiser = new Optimiser(file, graphInitialiser.getGraph(), graphInitialiser.getArcs(), startingNode);
         this.utilities.measureTime(data -> optimiser.findPath(false, false), file, false, false);
 
-        List<Movie> sequence = optimiser.getOptimalMovieSequence();
+        optimiser.getOptimalMovieSequence();
     }
 
     /**
@@ -80,16 +84,15 @@ public class Assignments {
      * 
      * @param file The list of movies to process.
      */
-    public void runAssignment1e(List<Movie> file) {
-        System.out.println("************************************");
-        System.out.println("Assignment 1e: Optimising movie schedule based on a time limit (6h)");
+    public void runAssignment1e(List<Movie> file, String keyTitle) {
+        System.out.println("\n------------------------------------------------------------------------------------------------------");
+        System.out.println("A1e: Optimising movie schedule based on a time limit (6h)");
 
         Sorter sorter = new Sorter();
         Comparator<Movie> movieComparatorStartTimeAscending = MovieComparators.byStartTime(true);
-        sorter.sortData(file, movieComparatorStartTimeAscending, "File1");
+        sorter.sortData(file, movieComparatorStartTimeAscending, keyTitle);
 
         Movie startingNode = file.get(0);
-        System.out.println(startingNode.toString());
 
         DirectedGraphInitialiser graphInitialiser = new DirectedGraphInitialiser(file, file.get(1), sorter);
 
@@ -102,13 +105,13 @@ public class Assignments {
      * 
      * @param file The list of movies to process.
      */
-    public void runAssignment1f(List<Movie> file) {
-        System.out.println("************************************");
-        System.out.println("Assignment 1f: Finding the minimum number of rooms required to show all movies");
+    public void runAssignment1f(List<Movie> file, String keyTitle) {
+        System.out.println("\n------------------------------------------------------------------------------------------------------");
+        System.out.println("A1f: Finding the minimum number of rooms required to show all movies");
 
         Sorter sorter = new Sorter();
         Comparator<Movie> movieComparatorStartTimeAscending = MovieComparators.byStartTime(true);
-        sorter.sortData(file, movieComparatorStartTimeAscending, "File1");
+        sorter.sortData(file, movieComparatorStartTimeAscending, keyTitle);
 
         // Allocate rooms for the movies
         CinemaScheduler cinemaRoomAllocator = new CinemaScheduler(file);

@@ -1,6 +1,8 @@
 /**
  * A StopWatch accumulates time when it is running. You can start and stop it multiple times to 
  * measure the total elapsed time. The stopwatch measures time in both nanoseconds and milliseconds.
+ * 
+ * @author 611968bq - Berend Quist
  */
 public class StopWatch {
 
@@ -71,7 +73,7 @@ public class StopWatch {
      * Prints the total elapsed time in both milliseconds and nanoseconds.
      */
     public void output() {
-        System.out.println("Elapsed time: " + getElapsedTimeInMilli() + " milliseconds (" + getElapsedTimeInNano() + " nanoseconds)");
+        System.out.println("\nFinished running the Method: \n -> Elapsed time: " + getElapsedTimeInMilli() + " milliseconds (" + getElapsedTimeInNano() + " nanoseconds)");
     }
 
 }

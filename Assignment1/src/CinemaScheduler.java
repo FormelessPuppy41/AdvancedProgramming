@@ -85,7 +85,7 @@ public class CinemaScheduler {
      * @return The minimum number of rooms required to prevent scheduling conflicts.
      */
     public int findMinimumRequiredRooms() {
-        System.out.println("************************************");
+        System.out.println("-----------------");
         System.out.println("Calculating minimum number of rooms required...");
         
         updateTimeSlotTracker();  // Updates time slot tracker based on movie times
@@ -107,7 +107,7 @@ public class CinemaScheduler {
             }
         }
         
-        System.out.println("Minimum number of rooms required: " + maxOccurrences);
+        System.out.println("Minimum number of rooms found. \n -> Minimum number of rooms required: " + maxOccurrences);
         return maxOccurrences;
     }
 }

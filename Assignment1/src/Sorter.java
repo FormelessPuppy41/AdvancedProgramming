@@ -30,8 +30,10 @@ public class Sorter {
 
         // Check if the data is already sorted before sorting to avoid unnecessary sorting.
         if (!isDataSorted(data, comparator)) {
+            System.out.println("-> Data is not sorted. Sorting data...");
             quickSort(data, 0, data.size() - 1, comparator);
         }
+        System.out.println("Data sorted.");
     }
 
     /**
@@ -42,15 +44,16 @@ public class Sorter {
      * @return true if the data is sorted, false otherwise.
      */
     public boolean isDataSorted(List<Movie> data, Comparator<Movie> comparator) {
-        System.out.println("Start checking if data is sorted");
+        System.out.println("-> Check if data is sorted.");
 
         // Loop through the list to verify if it is sorted
         for (int i = 0; i < data.size() - 1; i++) {
             if (comparator.compare(data.get(i), data.get(i + 1)) > 0) {
-                System.out.println("Data is not sorted: -- Value1: " + data.get(i) + " -- Value2: " + data.get(i + 1));
+                System.out.println("--> Data is not sorted: -- Value1: " + data.get(i) + " -- Value2: " + data.get(i + 1));
                 return false;
             }
         }
+        System.out.println("--> Data is sorted.");
         return true;
     }
 

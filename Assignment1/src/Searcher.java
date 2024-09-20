@@ -115,7 +115,15 @@ public class Searcher {
      * @return The index of the movie if found, or -1 if not found.
      */
     public int findMovie(List<Movie> data, Movie key) {
-        return binarySearch(data, 0, data.size() - 1, key);
+        logStartSearch(key);
+        int resultIndex = binarySearch(data, 0, data.size() - 1, key);
+        if (resultIndex == -1) {
+            System.out.println("Movie not found.");
+        } else {
+            logSearchResult(resultIndex, key);
+        }
+
+        return resultIndex;
     }
 
     /**
@@ -141,6 +149,7 @@ public class Searcher {
         if (exactMatch) {
             resultIndex = findMovie(data, partialMovie); // Perform exact match search
         } else {
+            logStartSearch(partialMovie);
             if (firstMatch) {
                 resultIndex = binarySearchFindFirst(data, 0, data.size() - 1, partialMovie);
             } else {
@@ -148,6 +157,30 @@ public class Searcher {
             }
         }
 
+        logSearchResult(resultIndex, data.get(resultIndex));
         return resultIndex;
+    }
+
+    /**
+     * Logs the start of the search operation.
+     * 
+     * @param movie The movie to search for.
+     */
+    private void logStartSearch(Movie movie) {
+        System.out.println("\nStart search for (partial) movie: " + movie.getTitle() + " (Rating: " + movie.getRating() + ", Duration: " + movie.getDuration() + ", Start Time: " + movie.getStartTime() + ")");
+    }
+
+    /**
+     * Logs the search result based on the index and movie found.
+     * 
+     * @param index The index of the movie found.
+     * @param movie The movie object found.
+     */
+    private void logSearchResult(int index, Movie movie) {
+        if (index != -1) {
+            System.out.println("-> Movie found at index: " + index + " - " + movie.toString());
+        } else {
+            System.out.println("-> Movie not found.");
+        }
     }
 }

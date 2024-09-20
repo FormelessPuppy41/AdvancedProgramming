@@ -205,13 +205,14 @@ public class Optimiser {
 
         Double[] path = findPaths(shortestPath, timeLimit);
 
+        System.out.println("-> Movie schedule optimised.");
+
         if (shortestPath) {
             logPath(shortestPath, path);
         } else {
             logPath(shortestPath, path);
         }
 
-        System.out.println("Movie schedule optimised.");
         return path;
     }
 
@@ -224,7 +225,7 @@ public class Optimiser {
     private void logPath(boolean shortestPath, Double[] path) {
         double value = shortestPath ? findMinValue(path) : findMaxValue(path);
         String pathType = shortestPath ? "shortest" : "longest";
-        System.out.println("The " + pathType + " path is: " + value + ", at index: " + Arrays.asList(path).indexOf(value));
+        System.out.println("-> The " + pathType + " path is: " + value + ", ending at index: " + Arrays.asList(path).indexOf(value));
     }
 
     /**
@@ -236,9 +237,11 @@ public class Optimiser {
      * @return The list of movies in the optimal sequence.
      */
     public List<Movie> findPathDisregardStartingIndex(boolean shortestPath, boolean timeLimit) {
+        System.out.println("-----------------");
+        System.out.println("Finding the optimal movie sequence disregarding the starting index. That is, testing all possible starting points and finding the optimal.");
         HashMap<Movie, Double> movieScores = new HashMap<>();
         HashMap<Movie, List<Movie>> movieSequences = new HashMap<>();
-
+    
         evaluateAllStartingNodes(shortestPath, timeLimit, movieScores, movieSequences);
 
         Movie optimalStartingMovie = getOptimalStartingMovie(movieScores);
@@ -267,7 +270,10 @@ public class Optimiser {
             HashMap<Movie, List<Movie>> movieSequences
         ) {
         for (Movie movie : this.graph.nodes) {
-            System.out.println("Checking path for index: " + this.graph.nodes.indexOf(movie) + ", Movie: " + movie);
+            // Log progress for every 100th movie
+            if (this.graph.nodes.indexOf(movie)%100 == 0) {
+                System.out.println("---> Checking path for index: " + this.graph.nodes.indexOf(movie) + ", Movie: " + movie);
+            }
 
             setStartNode(movie);  // Reset starting node to the current movie
             Double[] path = findPaths(shortestPath, timeLimit);  // Find the path for the current node
@@ -303,7 +309,7 @@ public class Optimiser {
     private void logOptimalPathResult(Movie optimalStartingMovie, List<Movie> optimalSequence, HashMap<Movie, Double> movieScores) {
         System.out.println("-----------------");
         System.out.println("The optimal starting movie is: " + optimalStartingMovie);
-        System.out.println("The optimal sequence is: " + optimalSequence);
+        //System.out.println("The optimal sequence of previous nodes is: " + optimalSequence);
         System.out.println("The optimal score is: " + movieScores.get(optimalStartingMovie));
     }
 
@@ -325,7 +331,7 @@ public class Optimiser {
         }
 
         Collections.reverse(optimalSequence);  // Reverse to get correct order
-        System.out.println("The optimal sequence is: " + optimalSequence);
+        System.out.println("-> The optimal sequence is: " + optimalSequence);
 
         return optimalSequence;
     }
@@ -344,7 +350,7 @@ public class Optimiser {
             return optimalSequence;  // No valid sequence found
         }
 
-        System.out.println("First value found at index: " + index + ", Movie: " + this.graph.getNodes().get(index));
+        System.out.println("-> First value found at index: " + index + ", Movie: " + this.graph.getNodes().get(index));
 
         buildSequenceFromIndex(sequence, optimalSequence, index);
 

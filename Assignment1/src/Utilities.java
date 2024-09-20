@@ -5,6 +5,8 @@ import java.util.function.Consumer;
 /**
  * A utility class that provides functionality for measuring the time taken by algorithms
  * and for deep copying data structures such as lists and arrays.
+ * 
+ * @author 611968bq - Berend Quist
  */
 public class Utilities {
     protected final StopWatch stopWatch;
